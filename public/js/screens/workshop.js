@@ -60,7 +60,6 @@ export default {
       mount(stage,
         el('div', { class: 'workshop__guitar' }, renderGuitar(guitar, { label: 'Моя гитара' })),
         el('div', { class: 'workshop__stats' }, `⭐ ${stars} · открыто ${open} из ${ITEMS.length}`),
-        el('div', { class: 'workshop__sound' }, `Звук: ${sound.sound}`),
         el('div', { class: 'workshop__tunes' }, sound.tunes.map((tune) => el('button', {
           class: `tune ${tune.id === playing ? 'tune--on' : ''}`,
           type: 'button',

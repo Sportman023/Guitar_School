@@ -35,7 +35,6 @@ const BUMBLEBEE = 'E5:.25 D#5 D5 C#5 D5 C#5 C5 B4 C5 C#5 D5 C#5 C5 B4 A#4 A4';
 
 export const GUITAR_SOUNDS = {
   classic: {
-    sound: 'нейлоновые струны',
     timbre: { sustain: 2.4, smooth: 2, lowpass: 2600, volume: 0.55, strum: 0.025 },
     hello: 'C3+E3+G3+C4+E4:2',
     tunes: [
@@ -89,7 +88,6 @@ export const GUITAR_SOUNDS = {
   },
 
   heart: {
-    sound: 'звонкие, как у укулеле',
     timbre: { sustain: 1.1, smooth: 1, lowpass: 5200, volume: 0.45, strum: 0.02, double: 1.004 },
     hello: 'C4+E4+G4+C5:2',
     tunes: [
@@ -137,7 +135,6 @@ export const GUITAR_SOUNDS = {
   },
 
   electric: {
-    sound: 'электрогитара с усилителем',
     timbre: {
       sustain: 4, smooth: 1, lowpass: 4200, volume: 0.3, strum: 0.012, drive: 4,
       echo: { time: 0.28, feedback: 0.25, mix: 0.18 },
@@ -193,7 +190,6 @@ export const GUITAR_SOUNDS = {
   },
 
   star: {
-    sound: 'космическое эхо',
     timbre: {
       sustain: 3, smooth: 1, lowpass: 6500, volume: 0.36, strum: 0.03, double: 1.003,
       echo: { time: 0.36, feedback: 0.45, mix: 0.5 },
@@ -249,7 +245,6 @@ export const GUITAR_SOUNDS = {
   },
 
   arrow: {
-    sound: 'тяжёлый рок',
     timbre: { sustain: 4, smooth: 0, lowpass: 3200, volume: 0.22, strum: 0.006, drive: 18 },
     hello: 'E2+B2+E3:2',
     tunes: [
