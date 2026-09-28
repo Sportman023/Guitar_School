@@ -1,12 +1,10 @@
-// Web Audio helpers: the audio context, short feedback sounds (right, wrong,
-// fanfare) and the guitar of the workshop.
+// Web Audio helpers: the audio context and short feedback sounds (right,
+// wrong, fanfare).
 //
 // Notes are never synthesised — every note in the app sounds on the recorded
 // piano of piano.js, so a note sounds the same wherever the child meets it.
-// The only synthesised instrument left is the guitar strum of the workshop,
-// where it is the child's own guitar that sounds, not a note to learn.
-// It uses the Karplus–Strong algorithm: a short burst of noise that loops on
-// itself and slowly decays.
+// The only synthesised instrument is the workshop guitar (strings.js), where
+// it is the child's own guitar that sounds, not a note to learn.
 
 let ctx = null;
 
@@ -23,52 +21,6 @@ export function ensureAudio() {
   // another app
   if (ctx.state !== 'running') ctx.resume();
   return ctx;
-}
-
-/** A plucked string. Only the workshop guitar uses it — notes come from piano.js. */
-export function playNote(freq, { duration = 1.8, volume = 0.7 } = {}) {
-  const ac = ensureAudio();
-  if (!ac) return;
-
-  const sampleRate = ac.sampleRate;
-  const length = Math.floor(sampleRate * duration);
-  const period = Math.max(2, Math.round(sampleRate / freq));
-
-  const buffer = ac.createBuffer(1, length, sampleRate);
-  const out = buffer.getChannelData(0);
-
-  const ring = new Float32Array(period);
-  for (let i = 0; i < period; i++) ring[i] = Math.random() * 2 - 1;
-  // smooth the initial noise so the pluck sounds softer
-  for (let pass = 0; pass < 2; pass++) {
-    for (let i = 0; i < period; i++) ring[i] = (ring[i] + ring[(i + 1) % period]) / 2;
-  }
-
-  let idx = 0;
-  const damping = 0.996;
-  for (let i = 0; i < length; i++) {
-    const current = ring[idx];
-    out[i] = current;
-    ring[idx] = (current + ring[(idx + 1) % period]) * 0.5 * damping;
-    idx = (idx + 1) % period;
-  }
-
-  const fade = Math.floor(sampleRate * 0.25);
-  for (let i = Math.max(0, length - fade); i < length; i++) out[i] *= (length - i) / fade;
-
-  const source = ac.createBufferSource();
-  source.buffer = buffer;
-
-  const filter = ac.createBiquadFilter();
-  filter.type = 'lowpass';
-  filter.frequency.value = 3800;
-
-  const gain = ac.createGain();
-  gain.gain.value = volume;
-
-  source.connect(filter).connect(gain).connect(ac.destination);
-  source.start();
-  return source;
 }
 
 function blip(freq, startOffset, duration, type = 'sine', volume = 0.25) {

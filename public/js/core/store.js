@@ -15,9 +15,11 @@ import { IS_BETA } from './env.js';
 const SUFFIX = IS_BETA ? '-beta' : '';
 const KEY = `gitar-school-v2${SUFFIX}`;
 const SESSION_KEY = `gitar-school-player${SUFFIX}`;
+// beta players start rich, so the whole workshop can be tried right away
+const START_STARS = IS_BETA ? 9000 : 0;
 
 const emptyProgress = () => ({
-  stars: 0,
+  stars: START_STARS,
   modules: {},
   notes: {},
   settings: {},

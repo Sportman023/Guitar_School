@@ -1177,6 +1177,27 @@ main {
 .workshop__guitar { display: flex; justify-content: center; height: 250px; }
 .workshop__guitar .guitar { width: auto; height: 100%; }
 .workshop__stats { font-weight: 800; color: #ffe082; }
+.workshop__sound { font-size: 14px; font-weight: 700; color: rgba(255, 255, 255, .7); }
+
+.workshop__tunes { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+
+.tune {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 10px 14px;
+  border: 2px solid transparent;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .14);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.tune:active { transform: scale(.96); }
+.tune--on { border-color: #ffd54f; background: var(--accent); }
 
 .workshop__tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 

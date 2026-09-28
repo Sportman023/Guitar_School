@@ -5,17 +5,11 @@
 import { el, clear, mount } from '../core/ui.js';
 import { store } from '../core/store.js';
 import { renderGuitar, renderSticker, renderSwatch } from '../core/guitar.js';
-import { playNote } from '../core/audio.js';
+import { playTune, stopGuitar } from '../core/strings.js';
 import { KINDS, ITEMS, MAX_STICKERS, itemsOfKind, isUnlocked } from '../data/guitar.js';
+import { soundOf } from '../data/tunes.js';
 
 const EFFECT_ICONS = { none: '🚫', sparkles: '✨', glow: '🌟', fire: '🔥' };
-
-// C major, strummed from the lowest string up
-const CHORD = [130.81, 164.81, 196.0, 261.63, 329.63, 392.0];
-
-export function strum() {
-  CHORD.forEach((freq, i) => setTimeout(() => playNote(freq, { duration: 2.2, volume: 0.45 }), i * 55));
-}
 
 /** Small picture of an item for buttons: a guitar shape, a paint, a sticker or an effect. */
 export function itemPreview(item, guitar) {
@@ -50,21 +44,43 @@ export default {
     // open the first tab that has something new, otherwise the first one
     let tab = (KINDS.find((kind) => itemsOfKind(kind.id).some((item) => isNew(item, store.state))) || KINDS[0]).id;
     let hint = '';
+    let playing = null; // id of the tune that is playing now
 
     const stage = el('div', { class: 'workshop__stage' });
     const tabs = el('div', { class: 'workshop__tabs', role: 'tablist' });
     const hintEl = el('p', { class: 'workshop__hint' });
     const grid = el('div', { class: 'workshop__grid' });
 
+    // every body shape has its own voice and its own three tunes
     function renderStage() {
       const { guitar, stars } = store.state;
       const open = ITEMS.filter((item) => isUnlocked(item, stars)).length;
+      const sound = soundOf(guitar.shape);
       clear(stage);
       mount(stage,
         el('div', { class: 'workshop__guitar' }, renderGuitar(guitar, { label: 'Моя гитара' })),
         el('div', { class: 'workshop__stats' }, `⭐ ${stars} · открыто ${open} из ${ITEMS.length}`),
-        el('button', { class: 'btn btn--primary', type: 'button', onclick: strum }, '🎵 Сыграть'),
+        el('div', { class: 'workshop__tunes' }, sound.tunes.map((tune) => el('button', {
+          class: `tune ${tune.id === playing ? 'tune--on' : ''}`,
+          type: 'button',
+          'aria-pressed': String(tune.id === playing),
+          onclick: () => toggleTune(tune),
+        }, el('span', null, tune.id === playing ? '⏹' : tune.emoji), el('span', null, tune.name)))),
       );
+    }
+
+    function toggleTune(tune) {
+      if (playing === tune.id) {
+        stopGuitar();
+        playing = null;
+      } else {
+        playing = tune.id;
+        playTune(tune, soundOf(store.state.guitar.shape).timbre, () => {
+          playing = null;
+          renderStage();
+        });
+      }
+      renderStage();
     }
 
     function renderTabs() {
@@ -141,7 +157,14 @@ export default {
         if (stickers.length > MAX_STICKERS) stickers = stickers.slice(-MAX_STICKERS);
         store.setGuitar({ stickers });
       } else {
+        const reshaped = item.kind === 'shape' && guitar.shape !== item.id;
         store.setGuitar({ [item.kind]: item.id });
+        // a new body says hello in its own voice
+        if (reshaped) {
+          const sound = soundOf(item.id);
+          playing = null;
+          playTune({ bpm: 60, voices: [sound.hello] }, sound.timbre);
+        }
       }
       renderStage();
       renderGrid();
@@ -154,6 +177,9 @@ export default {
     renderAll();
 
     // "new" badges stay for the whole visit and disappear next time
-    return () => store.markWorkshopSeen();
+    return () => {
+      stopGuitar();
+      store.markWorkshopSeen();
+    };
   },
 };
