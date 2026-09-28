@@ -1199,7 +1199,7 @@ main {
 .tune:active { transform: scale(.96); }
 .tune--on { border-color: #ffd54f; background: var(--accent); }
 
-.workshop__tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.workshop__tabs { display: grid; grid-template-columns: repeat(4, 1fr) 1.1fr; gap: 6px; }
 
 .workshop__tab {
   position: relative;
@@ -1219,6 +1219,17 @@ main {
 
 .workshop__tab span:first-child { font-size: 22px; }
 .workshop__tab--on { border-color: #ffd54f; background: rgba(255, 213, 79, .16); color: #fff; }
+
+.workshop__tool-icon { display: block; width: 38px; height: 26px; }
+
+.workshop__tab--tool {
+  margin-left: 4px;
+  border: 2px dashed rgba(255, 255, 255, .3);
+  background: transparent;
+  line-height: 1.15;
+  text-align: center;
+  text-decoration: none;
+}
 
 .workshop__dot {
   position: absolute;
@@ -1293,19 +1304,6 @@ main {
   .workshop__stage { position: sticky; top: 84px; }
   .workshop__guitar { height: 330px; }
 }
-
-.workshop__tuner {
-  padding: 10px 16px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, .08);
-  border: 2px dashed rgba(255, 255, 255, .3);
-  color: #fff;
-  font-size: 15px;
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.workshop__tuner:active { transform: scale(.96); }
 
 /* ---------- Tuner ---------- */
 
