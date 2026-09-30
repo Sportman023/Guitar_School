@@ -2,7 +2,7 @@
 // With a connection the app is always the latest version; without one
 // (e.g. a tablet with no internet) it keeps working from the cache.
 // Paths are relative to this file, so the app works both at the site root
-// and in a subfolder such as GitHub Pages' /Gitar_School/.
+// and in a subfolder such as GitHub Pages' /Guitar_School/.
 //
 // GitHub Pages lets browsers keep files for 10 minutes, so right after a deploy
 // the page would still get old files. That's why every request asks the server
