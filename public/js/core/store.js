@@ -13,6 +13,8 @@ import { IS_BETA } from './env.js';
 
 // the beta keeps its own players, so trying it never touches the children's stars
 const SUFFIX = IS_BETA ? '-beta' : '';
+// The old "gitar" spelling is kept on purpose: the children's stars are saved
+// under these keys, and renaming them would risk losing progress.
 const KEY = `gitar-school-v2${SUFFIX}`;
 const SESSION_KEY = `gitar-school-player${SUFFIX}`;
 // beta players start rich, so the whole workshop can be tried right away
