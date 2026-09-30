@@ -14,6 +14,7 @@
 // cache and only ever deletes its own old ones; the main copy also leaves the
 // beta/ subfolder alone, which the beta's own service worker looks after.
 const IS_BETA = self.location.pathname.includes('/beta/');
+// old "gitar" spelling kept on purpose, see store.js
 const PREFIX = IS_BETA ? 'gitar-school-beta-v' : 'gitar-school-v';
 const CACHE = `${PREFIX}2`;
 const BETA_URL = new URL('beta/', self.location).href;
