@@ -66,7 +66,6 @@ export default {
           'aria-pressed': String(tune.id === playing),
           onclick: () => toggleTune(tune),
         }, el('span', null, tune.id === playing ? '⏹' : tune.emoji), el('span', null, tune.name)))),
-        el('a', { class: 'workshop__tuner', href: '#tuner' }, '🎚 Настроить струны'),
       );
     }
 

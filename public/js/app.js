@@ -8,7 +8,6 @@ import { loadPiano, playPiano } from './core/piano.js';
 import { renderGuitar } from './core/guitar.js';
 import { mountPlayers } from './screens/players.js';
 import workshop, { itemPreview, itemTitle } from './screens/workshop.js';
-import tuner from './screens/tuner.js';
 import { IS_BETA } from './core/env.js';
 
 // a "БЕТА" badge, so the test copy is never mistaken for the real one
@@ -21,7 +20,7 @@ const starEl = document.getElementById('starCounter');
 const playerBtn = document.getElementById('playerBtn');
 
 // Screens that are reachable by address but are not menu sections.
-const SCREENS = [workshop, tuner];
+const SCREENS = [workshop];
 
 let cleanup = null;
 // where the back arrow leads from the screen on display
@@ -242,8 +241,7 @@ function renderPlayers() {
 function renderSection(screen) {
   titleEl.textContent = screen.title;
   backBtn.hidden = false;
-  // a screen can name its parent screen, e.g. the tuner leads back to the workshop
-  parentRoute = screen.parent || (screen.group ? `t/${screen.group}` : '');
+  parentRoute = screen.group ? `t/${screen.group}` : '';
   cleanup = screen.mount(appEl) || null;
 }
 
