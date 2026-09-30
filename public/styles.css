@@ -1410,30 +1410,6 @@ main {
   color: rgba(255, 255, 255, .6);
 }
 
-/* what the microphone hears right now */
-.tuner__ear {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 0 4px;
-  font-size: 13px;
-  font-weight: 700;
-  color: rgba(255, 255, 255, .6);
-}
-
-.tuner__level {
-  flex: 0 0 96px;
-  height: 8px;
-  border-radius: 4px;
-  background: rgba(255, 255, 255, .12);
-  overflow: hidden;
-}
-
-.tuner__level-bar { height: 100%; border-radius: 4px; background: rgba(255, 255, 255, .45); }
-.tuner__ear--noise .tuner__level-bar { background: #FFB74D; }
-.tuner__ear--note .tuner__level-bar { background: #69F0AE; }
-.tuner__ear--dead { color: #FF8A80; }
-
 .tuner__strings { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
 
 .tuner__string {

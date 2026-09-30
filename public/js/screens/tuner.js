@@ -6,7 +6,7 @@
 // tools/test-pitch.mjs; this file is the microphone and the screen.
 
 import { el, clear, mount } from '../core/ui.js';
-import { detectAround, rms, bandFor, PitchTracker, HUM, HUM_Q, MIN_RMS } from '../core/pitch.js';
+import { detectAround, rms, bandFor, PitchTracker, HUM, HUM_Q } from '../core/pitch.js';
 import { GUITAR_STRINGS } from '../data/tuning.js';
 
 /** Closer than this, in cents, the string is in tune. */
@@ -19,10 +19,6 @@ const TOO_TIGHT = 100;
 const HOLD_IN_TUNE = 1000;
 /** How often a frame is analysed, ms (tools/test-pitch.mjs checks the same step). */
 const STEP = 50;
-/** Below this the microphone gives no signal at all, not even room noise. */
-const DEAD = 0.00002;
-/** The loudness bar runs from this level to full scale, dB. */
-const FLOOR_DB = -70;
 
 const ERRORS = {
   NotAllowedError: 'Нет доступа к микрофону. Разреши его для этого сайта в настройках браузера и нажми «Включить микрофон» ещё раз.',
@@ -95,15 +91,12 @@ async function openMicrophone(target, ctxFromTap) {
     const analyser = new AnalyserNode(ctx, { fftSize: ctx.sampleRate > 50000 ? 8192 : 4096 });
     // some browsers only run a graph that ends at the speakers; it stays silent
     const mute = new GainNode(ctx, { gain: 0 });
-    const chain = [source, highpass, lowpass, ...notches, analyser, mute, ctx.destination];
-    chain.reduce((from, to) => from.connect(to));
+    [source, highpass, lowpass, ...notches, analyser, mute, ctx.destination]
+      .reduce((from, to) => from.connect(to));
 
     const frame = new Float32Array(analyser.fftSize);
     return {
       ctx,
-      // some browsers collect a microphone source nothing refers to, and the
-      // sound stops a little later with the context still running
-      chain,
       track: stream.getAudioTracks()[0],
       read() {
         analyser.getFloatTimeDomainData(frame);
@@ -144,8 +137,6 @@ export default {
     let wakeLock = null;
     let message = '';
     let cents = null;
-    let level = 0;
-    let heard = false;
     let inTuneSince = null;
     const tuned = new Set();
 
@@ -160,14 +151,6 @@ export default {
       if (cents > TOO_TIGHT) return { text: 'Слишком туго — ослабь, а то порвётся!', tone: 'danger' };
       if (cents > 0) return { text: cents <= NEAR ? 'Чуть-чуть ослабь ↓' : 'Ослабь струну ↓', tone: 'adjust' };
       return { text: cents >= -NEAR ? 'Чуть-чуть натяни ↑' : 'Натяни струну ↑', tone: 'adjust' };
-    }
-
-    /** What the microphone gives right now, so a silent one is told from an unclear note. */
-    function hearing() {
-      if (level < DEAD) return { text: 'Микрофон молчит', tone: 'dead' };
-      if (level < MIN_RMS) return { text: 'Тихо', tone: 'quiet' };
-      if (!heard) return { text: 'Слышу звук, но не эту струну', tone: 'noise' };
-      return { text: 'Слышу струну', tone: 'note' };
     }
 
     function renderStage() {
@@ -189,15 +172,6 @@ export default {
           el('span', null, cents === null ? ' ' : centsLabel(cents)),
           el('span', null, 'выше')),
       );
-      if (mic) {
-        const ear = hearing();
-        const loudness = Math.max(0, Math.min(1, 1 - (20 * Math.log10(level || 1e-9)) / FLOOR_DB));
-        mount(stage,
-          el('div', { class: `tuner__ear tuner__ear--${ear.tone}` },
-            el('div', { class: 'tuner__level' },
-              el('div', { class: 'tuner__level-bar', style: `width:${Math.round(loudness * 100)}%` })),
-            el('span', null, ear.text)));
-      }
     }
 
     function renderStrings() {
@@ -241,7 +215,6 @@ export default {
       string = item;
       tracker = new PitchTracker(string.freq);
       cents = null;
-      heard = false;
       inTuneSince = null;
       if (mic) mic.retune(string.freq);
       renderStrings();
@@ -258,10 +231,7 @@ export default {
       }
       const frame = mic.read();
       const now = performance.now();
-      const reading = detectAround(frame, mic.ctx.sampleRate, string.freq);
-      level = rms(frame);
-      heard = reading !== null;
-      cents = tracker.push(now, level, reading);
+      cents = tracker.push(now, rms(frame), detectAround(frame, mic.ctx.sampleRate, string.freq));
 
       if (cents !== null && Math.abs(cents) <= IN_TUNE) {
         if (inTuneSince === null) inTuneSince = now;
@@ -322,8 +292,6 @@ export default {
       if (mic) mic.stop();
       mic = null;
       cents = null;
-      level = 0;
-      heard = false;
       inTuneSince = null;
       if (wakeLock) wakeLock.release().catch(() => {});
       wakeLock = null;
