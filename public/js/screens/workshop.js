@@ -2,7 +2,7 @@
 // have unlocked. Locked items stay visible with their price in stars, so there
 // is always something to look forward to.
 
-import { el, svgEl, clear, mount } from '../core/ui.js';
+import { el, clear, mount } from '../core/ui.js';
 import { store } from '../core/store.js';
 import { renderGuitar, renderSticker, renderSwatch } from '../core/guitar.js';
 import { playTune, stopGuitar } from '../core/strings.js';
@@ -29,15 +29,6 @@ export function itemPreview(item, guitar) {
 export function itemTitle(item) {
   const label = KINDS.find((kind) => kind.id === item.kind).label;
   return `${label[0].toUpperCase()}${label.slice(1)} «${item.name}»`;
-}
-
-/** A tuner dial: a scale with a green middle and a needle, as on the tuner screen. */
-function tunerIcon() {
-  return svgEl('svg', { class: 'workshop__tool-icon', viewBox: '1 5.5 22 13.5', 'aria-hidden': 'true' },
-    svgEl('path', { d: 'M3 17 A9 9 0 0 1 21 17', fill: 'none', stroke: '#FFB74D', 'stroke-width': 2.5, 'stroke-linecap': 'round' }),
-    svgEl('path', { d: 'M9.7 8.3 A9 9 0 0 1 14.3 8.3', fill: 'none', stroke: '#69F0AE', 'stroke-width': 2.5 }),
-    svgEl('line', { x1: 12, y1: 17, x2: 14.2, y2: 9.5, stroke: '#fff', 'stroke-width': 2, 'stroke-linecap': 'round' }),
-    svgEl('circle', { cx: 12, cy: 17, r: 2, fill: '#fff' }));
 }
 
 const isNew = (item, state) => item.need > state.workshopSeen && isUnlocked(item, state.stars);
@@ -75,6 +66,7 @@ export default {
           'aria-pressed': String(tune.id === playing),
           onclick: () => toggleTune(tune),
         }, el('span', null, tune.id === playing ? '⏹' : tune.emoji), el('span', null, tune.name)))),
+        el('a', { class: 'workshop__tuner', href: '#tuner' }, '🎚 Настроить струны'),
       );
     }
 
@@ -108,11 +100,7 @@ export default {
         el('span', null, kind.emoji),
         el('span', null, kind.title),
         itemsOfKind(kind.id).some((item) => isNew(item, store.state)) ? el('span', { class: 'workshop__dot' }) : null,
-      )),
-      // not a kind of decoration but a tool, so it looks different and opens its own screen
-      el('a', { class: 'workshop__tab workshop__tab--tool', href: '#tuner' },
-        el('span', null, tunerIcon()),
-        el('span', null, 'Настроить гитару')));
+      )));
     }
 
     function renderGrid() {
