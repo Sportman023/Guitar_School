@@ -89,7 +89,7 @@ function renderHamster() {
 }
 
 /** Cheeks for `full` — the share of the round's slices the hamster has got, 0 to 1. */
-const cheeks = (full) => `--puff:${1 + full * 0.8};--puff-y:${1 + full * 0.4}`;
+const cheeks = (full) => `--puff:${1 + full * 1.6};--puff-y:${1 + full * 0.8}`;
 
 const calm = () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches;
 

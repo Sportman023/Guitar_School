@@ -893,8 +893,8 @@ main {
   border: 1px solid rgba(255, 255, 255, .1);
 }
 
-/* the hamster with the slices it has got so far */
-.pairs__who { display: grid; justify-items: center; gap: 4px; }
+/* the hamster with the slices it has got so far; wide enough for full cheeks */
+.pairs__who { display: grid; justify-items: center; gap: 4px; min-width: 104px; }
 .pairs__animal { width: 72px; }
 
 .hamster { display: block; width: 100%; height: auto; overflow: visible; }
