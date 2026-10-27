@@ -16,13 +16,14 @@ import octave1 from './octave1.js';
 import octave2 from './octave2.js';
 import octaveSmall from './octave-small.js';
 import octaves from './octaves.js';
+import orangeSlices from './orange-slices.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
 import { createQuiz, pickWithTwin } from '../core/quiz.js';
 import { el, noteBubble, colorBubble, noteStyle } from '../core/ui.js';
 import { playPiano } from '../core/piano.js';
-import { NOTE_BY_ID, octaveName } from '../data/notes.js';
+import { NOTE_BY_ID, isMixed, octaveName } from '../data/notes.js';
 
 // Topics of the home screen, in the order they are taught at school.
 // A new topic goes to the end of the list, so what is being learned now
@@ -127,8 +128,6 @@ function namePrompt(label, note) {
 // Every picture of a round is as big as the picked octaves need, so the staff
 // stays put while the questions go by.
 
-const isMixed = (notes) => new Set(notes.map((note) => note.octave)).size > 1;
-
 // Reading notes on the staff. Note heads follow the shared "coloured notes"
 // setting: colour is a hint here (red head → C), and the answers are words,
 // otherwise the child could match colour to colour without reading the staff.
@@ -195,4 +194,5 @@ export const MODULES = [
   octaves,
   staffToNote,
   noteToStaff,
+  orangeSlices,
 ];
