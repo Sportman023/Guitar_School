@@ -1198,15 +1198,20 @@ main {
 
 /* ---------- Pumpkins and leaves ---------- */
 
-/* the field takes the screen below the controls, so they are packed tighter */
-.patch-game .progress { margin-bottom: 10px; }
-.patch-game .toggle-row { margin-bottom: 8px; }
-.patch-game .feedback { min-height: 24px; margin: 4px 0 6px; font-size: 16px; }
+/* the field takes the screen below the controls, so they are packed tighter
+   (here and in "Pick the berries") */
+.patch-game .progress,
+.berry-game .progress { margin-bottom: 10px; }
+.patch-game .toggle-row,
+.berry-game .toggle-row { margin-bottom: 8px; }
+.patch-game .feedback,
+.berry-game .feedback { min-height: 24px; margin: 4px 0 6px; font-size: 16px; }
 
 /* on a phone "Нет, это Соль малой октавы. Найди её листочек" takes two lines;
    the room for them is kept, so the field doesn't jump down when it's said */
 @media (max-width: 520px) {
-  .patch-game .feedback { display: grid; align-content: center; min-height: 44px; }
+  .patch-game .feedback,
+  .berry-game .feedback { display: grid; align-content: center; min-height: 44px; }
 }
 
 .patch__task {
@@ -1381,6 +1386,136 @@ main {
 
 /* every pumpkin has its leaf: they all hop */
 .patch--done .pumpkin__body { animation: bounce .6s ease-in-out 3; }
+
+/* ---------- Pick the berries ---------- */
+
+.orchard__task {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .8);
+}
+
+.orchard__task b { font-size: 18px; font-weight: 900; color: #F48FB1; }
+
+.orchard {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* rows of --cols berries, the last one centred, as on the sheet; the sizes are
+   set by the game to fit the screen, the gap is the game's GAP */
+.berries {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  max-width: calc(var(--cols, 3) * var(--berry, 90px) + (var(--cols, 3) - 1) * 8px);
+  margin: 0 auto;
+}
+
+.berry {
+  position: relative;
+  display: block;
+  width: var(--berry, 90px);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: grab;
+  /* a finger on a berry carries it instead of scrolling the page */
+  touch-action: none;
+}
+
+.berry__body {
+  position: relative;
+  display: block;
+  filter: drop-shadow(0 6px 8px rgba(10, 5, 35, .35));
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.berry__art { display: block; width: 100%; height: auto; overflow: visible; }
+.berry__flesh { fill: #EF5350; stroke: #C62828; stroke-width: 1.5; }
+.berry__seed { fill: #FFE9A8; }
+.berry__sepals { fill: #7CB342; stroke: #558B2F; stroke-width: 1.2; stroke-linejoin: round; }
+.berry__stem { fill: none; stroke: #558B2F; stroke-width: 3; stroke-linecap: round; }
+
+/* the white face with the staff; the staff lines run on under its round edge */
+.berry__face {
+  position: absolute;
+  left: 50%;
+  top: 57%;
+  width: 78%;
+  height: 63%;
+  transform: translate(-50%, -50%);
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 50%;
+  background: #fffdf5;
+}
+
+/* the oval narrows at the top and the bottom, where the notes over and under
+   the staff hang, so the staff keeps clear of its edge there */
+.berry__face .staff { width: 100%; height: 90%; overflow: visible; }
+
+.berry:active .berry__body { transform: scale(.95); }
+.berry.is-carried,
+.berry.is-flying { z-index: 3; cursor: grabbing; }
+.berry.is-carried .berry__body { transform: scale(1.1); filter: drop-shadow(0 14px 14px rgba(10, 5, 35, .5)); }
+.berry.is-picked { visibility: hidden; }
+.berry.is-new { animation: pop .35s ease; }
+.berry.is-shaking .berry__body { animation: shake .4s ease; }
+
+.basket {
+  position: relative;
+  width: calc(var(--basket, 120px) * 4 / 3);
+  margin: 8px auto 0;
+  transition: transform .2s ease;
+}
+
+.basket__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 10px rgba(10, 5, 35, .4));
+  transition: filter .2s ease;
+}
+
+.basket__handle { fill: none; stroke: #A1703A; stroke-width: 7; stroke-linecap: round; }
+.basket__wicker { fill: #C8955A; stroke: #8A5A2B; stroke-width: 2; stroke-linejoin: round; }
+.basket__weave { stroke: #9C6B35; stroke-width: 2; }
+.basket__rim { fill: #B07A40; stroke: #8A5A2B; stroke-width: 2; }
+.basket__plate { fill: #FFF8E7; stroke: #D7B98A; stroke-width: 1.5; }
+
+.basket__name {
+  font-size: 19px;
+  font-weight: 900;
+  fill: #D81B60;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.basket__name--long { font-size: 16px; }
+
+/* a berry in the basket pops up over the rim */
+.basket__berry {
+  opacity: 0;
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1), opacity .2s ease;
+}
+
+.basket__berry.is-in { opacity: 1; transform: scale(1); }
+
+/* a berry carried over the basket */
+.basket.is-over { transform: scale(1.08); }
+.basket.is-over .basket__art { filter: drop-shadow(0 0 16px rgba(255, 213, 79, .9)); }
+
+.basket.is-full { animation: bounce .5s ease-in-out 2; }
 
 /* ---------- Players ---------- */
 

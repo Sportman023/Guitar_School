@@ -19,6 +19,7 @@ import octaves from './octaves.js';
 import orangeSlices from './orange-slices.js';
 import treeToys from './tree-toys.js';
 import pumpkins from './pumpkins.js';
+import berries from './berries.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -207,4 +208,5 @@ export const MODULES = [
   orangeSlices,
   treeToys,
   pumpkins,
+  berries,
 ];
