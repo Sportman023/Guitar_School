@@ -31,7 +31,7 @@ import { loadPiano, playPiano } from '../core/piano.js';
 import { isMixed, octaveName } from '../data/notes.js';
 
 const ID = 'orange-slices';
-const GROUP = 'staff';
+const GROUP = 'note-games';
 const ACCENT = '#FB8C00';
 // staves on the board at a time; the slices are one more
 const PLACES = 4;

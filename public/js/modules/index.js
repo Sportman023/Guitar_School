@@ -50,6 +50,13 @@ export const GROUPS = [
     emoji: '🎼',
     accent: '#5C6BC0',
   },
+  {
+    id: 'note-games',
+    title: 'Игры по ноткам',
+    subtitle: 'Играем с нотами на стане',
+    emoji: '🎲',
+    accent: '#FB8C00',
+  },
 ];
 
 // Play a reference C first, then the hidden note: the child compares
@@ -194,5 +201,6 @@ export const MODULES = [
   octaves,
   staffToNote,
   noteToStaff,
+
   orangeSlices,
 ];
