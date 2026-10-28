@@ -30,18 +30,18 @@ import { NOTE_BY_ID, isMixed, octaveName } from '../data/notes.js';
 // is always the last tile.
 export const GROUPS = [
   {
-    id: 'colors',
-    title: 'Ноты и цвета',
-    subtitle: 'Семь нот — семь цветов радуги',
-    emoji: '🎨',
-    accent: '#FF7043',
-  },
-  {
     id: 'hands',
     title: 'Пальцы',
     subtitle: 'Как зовут пальцы левой и правой руки',
     emoji: '🖐️',
     accent: '#00ACC1',
+  },
+  {
+    id: 'colors',
+    title: 'Ноты и цвета',
+    subtitle: 'Семь нот — семь цветов радуги',
+    emoji: '🎨',
+    accent: '#FF7043',
   },
   {
     id: 'staff',
@@ -185,15 +185,15 @@ const noteToStaff = createQuiz({
 });
 
 export const MODULES = [
+  fingers,
+  fingerToMark,
+  markToFinger,
+
   learn,
   noteToColor,
   colorToNote,
   rainbow,
   listenAndGuess,
-
-  fingers,
-  fingerToMark,
-  markToFinger,
 
   octave1,
   octave2,
