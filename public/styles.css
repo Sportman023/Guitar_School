@@ -1196,6 +1196,192 @@ main {
   to { filter: drop-shadow(0 0 16px rgba(255, 236, 150, .9)); }
 }
 
+/* ---------- Pumpkins and leaves ---------- */
+
+/* the field takes the screen below the controls, so they are packed tighter */
+.patch-game .progress { margin-bottom: 10px; }
+.patch-game .toggle-row { margin-bottom: 8px; }
+.patch-game .feedback { min-height: 24px; margin: 4px 0 6px; font-size: 16px; }
+
+/* on a phone "Нет, это Соль малой октавы. Найди её листочек" takes two lines;
+   the room for them is kept, so the field doesn't jump down when it's said */
+@media (max-width: 520px) {
+  .patch-game .feedback { display: grid; align-content: center; min-height: 44px; }
+}
+
+.patch__task {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .8);
+}
+
+/* a chessboard of --cols × --rows squares, sized by the game to fit the screen;
+   the gap is the game's GAP */
+.patch {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 3), minmax(0, 1fr));
+  grid-template-rows: repeat(var(--rows, 6), var(--row, 80px));
+  gap: 6px;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+.patch__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.vine {
+  fill: none;
+  stroke: #9CCC65;
+  stroke-width: 5;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 2px rgba(10, 5, 35, .5));
+}
+
+.vine--wrong { stroke: #ff8a80; }
+
+.pumpkin,
+.leaf {
+  display: block;
+  place-self: center;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  /* a finger on a pumpkin or a leaf draws a line instead of scrolling the page */
+  touch-action: none;
+}
+
+.pumpkin { width: var(--pumpkin, 100px); }
+.leaf { width: var(--leaf, 76px); }
+
+.pumpkin__body {
+  position: relative;
+  display: block;
+  filter: drop-shadow(0 6px 8px rgba(10, 5, 35, .35));
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.pumpkin__art { display: block; width: 100%; height: auto; overflow: visible; }
+.pumpkin__stalk { fill: #6D4C41; }
+.pumpkin__tendril { fill: none; stroke: #7CB342; stroke-width: 1.8; stroke-linecap: round; }
+.pumpkin__rib { stroke: #BF360C; stroke-width: 1.4; }
+.pumpkin__rib--outer { fill: #E65100; }
+.pumpkin__rib--mid { fill: #F57C00; }
+.pumpkin__rib--middle { fill: #FB8C00; }
+
+/* the white face with the staff; the staff lines run on under its round edge, as on the sheet */
+.pumpkin__face {
+  position: absolute;
+  left: 50%;
+  top: 57.8%;
+  width: 86%;
+  height: 78%;
+  transform: translate(-50%, -50%);
+  overflow: hidden;
+  border-radius: 36% / 40%;
+  box-shadow: inset 0 0 0 1.5px rgba(191, 54, 12, .35);
+  background: #fffdf5;
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+.pumpkin__face .staff { width: 100%; height: 100%; overflow: visible; }
+
+/* a pumpkin with its leaf is a pumpkin and nothing else: the note goes */
+.pumpkin.is-done .pumpkin__face { opacity: 0; transform: translate(-50%, -50%) scale(.6); }
+
+/* the leaf on the stalk grows once the pumpkin has found its leaf */
+.pumpkin__leaf {
+  transform-box: fill-box;
+  transform-origin: 0 100%;
+  transform: scale(0);
+  transition: transform .45s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+.pumpkin.is-done .pumpkin__leaf { transform: scale(1); }
+
+.leaf__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 5px 6px rgba(10, 5, 35, .35));
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.leaf__blade { fill: #A5BF94; stroke: #6F8F5F; stroke-width: 1.5; stroke-linejoin: round; }
+.pumpkin__leaf .leaf__blade { stroke-width: 1; }
+.leaf__vein { fill: none; stroke: #6F8F5F; stroke-width: 1.4; stroke-linecap: round; }
+.leaf__stem { fill: none; stroke: #6F8F5F; stroke-width: 3; stroke-linecap: round; }
+.leaf__label { fill: #fffdf5; }
+
+.leaf__name {
+  font-size: 20px;
+  font-weight: 900;
+  fill: #1d1734;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.leaf__name--long { font-size: 16px; }
+
+.pumpkin:active .pumpkin__body,
+.leaf:active .leaf__art { transform: scale(.95); }
+
+/* what was tapped first, or where a line starts, has to be seen from across the room */
+.pumpkin.is-selected .pumpkin__body,
+.leaf.is-selected .leaf__art {
+  transform: scale(1.08);
+  filter: drop-shadow(0 0 12px rgba(255, 213, 79, .95));
+}
+
+/* the pair under the finger while a line is drawn */
+.pumpkin.is-over .pumpkin__body,
+.leaf.is-over .leaf__art {
+  transform: scale(1.12);
+  filter: drop-shadow(0 0 12px rgba(156, 204, 101, .95));
+}
+
+.leaf.is-shaking { animation: shake .4s ease; }
+.leaf.is-flying { position: relative; z-index: 2; }
+.leaf.is-gone { visibility: hidden; }
+.leaf--extra { opacity: .45; }
+.leaf--extra .leaf__art { filter: grayscale(.6); }
+
+/* the jack-o'-lantern: once it has its leaf, its carved face is lit by a
+   candle inside, which flickers, and the pumpkin glows in the dark */
+.pumpkin__carving {
+  fill: #FFE082;
+  stroke: #8D3B00;
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  opacity: 0;
+  transition: opacity .5s ease .2s;
+}
+
+.pumpkin.is-done .pumpkin__carving { opacity: 1; animation: candle 1.8s ease-in-out .8s infinite; }
+.pumpkin--lantern.is-done .pumpkin__body { filter: drop-shadow(0 0 14px rgba(255, 179, 0, .75)); }
+
+@keyframes candle {
+  0%, 100% { opacity: 1; }
+  30% { opacity: .75; }
+  45% { opacity: .95; }
+  70% { opacity: .8; }
+}
+
+/* every pumpkin has its leaf: they all hop */
+.patch--done .pumpkin__body { animation: bounce .6s ease-in-out 3; }
+
 /* ---------- Players ---------- */
 
 .players__hello {
