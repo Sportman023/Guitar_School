@@ -2,9 +2,9 @@
 // with the note names stand on top, as on the sheet (До — red, Ре — orange …),
 // and below hang glass balls and stars, each with a note on the staff. Tap a
 // paint and then a toy with that note: the toy takes the paint and its note
-// sounds on the piano. The brush keeps its paint, so all the toys of one note
-// can be painted one after another, the way a colouring page is done. A toy
-// can be tapped first too, and then its paint.
+// sounds on the piano. A toy can be tapped first too, and then its paint.
+// After every painted toy the brush is washed: children often tap the toy
+// first, and a paint left on the brush would land on it at once.
 //
 // The note heads are always black: a coloured head would show which paint to
 // take, and the staff wouldn't have to be read. The names under the paints
@@ -275,6 +275,8 @@ export default {
 
       if (isFirstTry) score += 1;
       toy.painted = true;
+      // the next pair starts from scratch, whichever is tapped first
+      brush = null;
       waiting = null;
       showPicks();
       node.style.setProperty('--paint', toy.note.color);
