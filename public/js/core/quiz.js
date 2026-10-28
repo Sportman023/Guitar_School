@@ -62,7 +62,8 @@ export function pickWithTwin(key) {
   };
 }
 
-function buildQueue(notes, count) {
+/** `count` notes in random order, every note of the set about equally often. */
+export function buildQueue(notes, count) {
   const queue = [];
   while (queue.length < count) queue.push(...shuffle(notes));
   return queue.slice(0, count);

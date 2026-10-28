@@ -1042,6 +1042,160 @@ main {
 .slice__name { font-size: 22px; font-weight: 900; }
 .slice__octave { font-size: 11px; font-weight: 800; }
 
+/* ---------- Christmas toys ---------- */
+
+.toys__task {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .8);
+}
+
+/* the paints stay just under the top bar while the toys are scrolled;
+   --bar is the bar's height, set by the game */
+.paints {
+  position: sticky;
+  top: var(--bar, 63px);
+  z-index: 5;
+  margin: 0 -16px;
+  padding: 8px 16px 0;
+  background: rgba(22, 16, 54, .92);
+  backdrop-filter: blur(12px);
+}
+
+.paints .feedback { min-height: 26px; margin: 4px 0 0; font-size: 16px; }
+
+.paints__row {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+  max-width: 520px;
+  margin: 0 auto;
+}
+
+.paint {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 4px 0 6px;
+  border: 0;
+  border-radius: 14px;
+  background: none;
+  color: #fff;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.paint__blot {
+  display: block;
+  width: 100%;
+  max-width: 56px;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .35));
+  transition: transform .15s ease;
+}
+
+.paint__name { font-size: 15px; font-weight: 900; }
+.paint:active .paint__blot { transform: scale(.9); }
+
+/* the paint on the brush */
+.paint.is-selected { background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 3px #ffd54f; }
+.paint.is-selected .paint__blot { transform: scale(1.15) rotate(-8deg); }
+.paint.is-selected::after {
+  content: '🖌️';
+  position: absolute;
+  top: -4px;
+  right: -2px;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* rows of two on a phone, of four on a tablet; balls and stars of a row are
+   centred on each other, so they hang at different heights as on the sheet */
+.toys {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  align-items: center;
+  gap: 10px 12px;
+  margin-top: 12px;
+}
+
+.toy {
+  position: relative;
+  display: block;
+  width: min(170px, calc(50% - 6px));
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  /* a toy swings on its string */
+  transform-origin: 50% 0;
+}
+
+.toy__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 10px rgba(10, 5, 35, .35));
+  transition: filter .2s ease;
+}
+
+.toy__staff {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.toy__glass {
+  fill: #fffdf5;
+  stroke: #2b2448;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  transition: fill .5s ease, stroke .15s ease;
+}
+
+.toy__string { fill: none; stroke: rgba(255, 255, 255, .6); stroke-width: 1.6; stroke-linecap: round; }
+.toy__cap { fill: #FFD54F; stroke: #8D6E00; stroke-width: 1.4; stroke-linejoin: round; }
+.toy__shine { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; opacity: 0; transition: opacity .5s ease; }
+.toy:active .toy__art { transform: scale(.96); }
+
+/* what was tapped first has to be seen from across the room */
+.toy.is-selected .toy__glass { stroke: #ffd54f; stroke-width: 5; }
+.toy.is-selected .toy__art { filter: drop-shadow(0 0 14px rgba(255, 213, 79, .85)); }
+.toy.is-shaking { animation: shake .4s ease; }
+
+.toy.is-painted { animation: swing 1s ease-out; }
+.toy.is-painted .toy__glass { fill: var(--paint); }
+.toy.is-painted .toy__shine { opacity: .45; }
+
+/* on painted glass the staff takes the colour that reads on that paint */
+.toy.is-painted .staff__line,
+.toy.is-painted .staff__ledger,
+.toy.is-painted .staff__stem { stroke: var(--paint-ink); transition: stroke .5s ease; }
+.toy.is-painted .staff__head,
+.toy.is-painted .staff__clef { fill: var(--paint-ink); transition: fill .5s ease; }
+
+/* every toy is painted: the tree lights up */
+.toys--done .toy__art { animation: lit 1s ease-in-out infinite alternate; }
+
+@keyframes swing {
+  0% { transform: rotate(0); }
+  20% { transform: rotate(9deg); }
+  45% { transform: rotate(-6deg); }
+  70% { transform: rotate(3deg); }
+  100% { transform: rotate(0); }
+}
+
+@keyframes lit {
+  to { filter: drop-shadow(0 0 16px rgba(255, 236, 150, .9)); }
+}
+
 /* ---------- Players ---------- */
 
 .players__hello {

@@ -17,6 +17,7 @@ import octave2 from './octave2.js';
 import octaveSmall from './octave-small.js';
 import octaves from './octaves.js';
 import orangeSlices from './orange-slices.js';
+import treeToys from './tree-toys.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -203,4 +204,5 @@ export const MODULES = [
   noteToStaff,
 
   orangeSlices,
+  treeToys,
 ];
