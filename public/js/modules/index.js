@@ -54,7 +54,7 @@ export const GROUPS = [
     id: 'note-games',
     title: 'Игры по ноткам',
     subtitle: 'Играем с нотами на стане',
-    emoji: '🎲',
+    emoji: '🎶',
     accent: '#FB8C00',
   },
 ];
