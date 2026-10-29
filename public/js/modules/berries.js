@@ -37,17 +37,18 @@ const RIGHT = [2, 3, 4];
 // the one with the bigger berries is taken
 const COLUMNS = [3, 5];
 // the gap between the berries and above the basket, as in styles.css
-const GAP = 8;
+const GAP = 6;
 // a berry is never lower than this, even on a short screen (then the page
 // scrolls), and never higher than that, so it doesn't swell on a big one
 const MIN_BERRY = 70;
-const MAX_BERRY = 190;
+const MAX_BERRY = 230;
 // the basket is as tall as this many berries
-const BASKET_ROWS = 1;
+const BASKET_ROWS = 0.85;
 
-// The berry is drawn 80 × 100, the basket 160 × 120; the points below are in
-// the same units.
-const BERRY = { width: 80, height: 100 };
+// The berry is drawn 80 × 100 and shown from y = 6, where its stem begins,
+// so there is no empty strip over it; the basket is drawn 160 × 120. The
+// points below are in the same units.
+const BERRY = { top: 6, width: 80, height: 94 };
 const BASKET = { width: 160, height: 120 };
 // where a berry drops into the basket
 const OPENING = { x: 80, y: 52 };
@@ -71,14 +72,14 @@ function berryShape() {
   });
   return [
     svgEl('path', { d: BODY, class: 'berry__flesh' }),
-    svgEl('path', { d: 'M40 20 C40 13 42 7 47 3', class: 'berry__stem' }),
+    svgEl('path', { d: 'M40 20 C40 15 42 11 46 8', class: 'berry__stem' }),
     svgEl('polygon', { points: sepals.join(' '), class: 'berry__sepals' }),
   ];
 }
 
 function berryArt() {
   const [flesh, ...top] = berryShape();
-  return svgEl('svg', { viewBox: `0 0 ${BERRY.width} ${BERRY.height}`, class: 'berry__art', 'aria-hidden': 'true' },
+  return svgEl('svg', { viewBox: `0 ${BERRY.top} ${BERRY.width} ${BERRY.height}`, class: 'berry__art', 'aria-hidden': 'true' },
     flesh,
     ...SEEDS.map(([cx, cy]) => svgEl('ellipse', { cx, cy, rx: 1.4, ry: 2.2, class: 'berry__seed' })),
     ...top);
@@ -377,7 +378,8 @@ export default {
       }
       owed += 1;
       playFail();
-      say(`Нет, это ${label(berry.note)}. Нужна нота ${basket().target.ru}`, 'bad');
+      // short enough for one line on a phone, so the berries don't jump down
+      say(`Нет, это ${label(berry.note)}, а нужна ${basket().target.ru}`, 'bad');
       if (dx || dy) putBack(node, dx, dy);
       node.classList.add('is-shaking');
       node.addEventListener('animationend', () => node.classList.remove('is-shaking'), { once: true });
