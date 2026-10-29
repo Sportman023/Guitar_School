@@ -1453,16 +1453,15 @@ main {
   width: 78%;
   height: 67%;
   transform: translate(-50%, -50%);
-  display: grid;
-  place-items: center;
   overflow: hidden;
   border-radius: 50%;
   background: #fffdf5;
 }
 
 /* the oval narrows at the top and the bottom, where the notes over and under
-   the staff hang, so the staff keeps clear of its edge there */
-.berry__face .staff { width: 100%; height: 90%; overflow: visible; }
+   the staff hang, so the staff keeps clear of its edge there; placed by hand,
+   so that its height is surely kept */
+.berry__face .staff { position: absolute; top: 5%; left: 0; width: 100%; height: 90%; overflow: visible; }
 
 .berry:active .berry__body { transform: scale(.95); }
 .berry.is-carried,
@@ -1520,6 +1519,177 @@ main {
 .basket.is-over .basket__art { filter: drop-shadow(0 0 16px rgba(255, 213, 79, .9)); }
 
 .basket.is-full { animation: bounce .5s ease-in-out 2; }
+
+/* ---------- Note detective ---------- */
+
+/* the case stays just under the top bar while the map is scrolled;
+   --bar is the bar's height, set by the game */
+.case {
+  position: sticky;
+  top: var(--bar, 63px);
+  z-index: 5;
+  display: grid;
+  place-content: center;
+  justify-items: center;
+  gap: 2px;
+  min-height: 72px;
+  margin: 0 -16px;
+  padding: 10px 16px;
+  text-align: center;
+  background: rgba(22, 16, 54, .92);
+  backdrop-filter: blur(12px);
+}
+
+.case__task { font-size: 19px; font-weight: 800; color: rgba(255, 255, 255, .92); }
+
+/* the note looked for, on its own colour: a coloured word would be hard to
+   read on the dark bar (Ля is dark blue) */
+.case__note {
+  display: inline-block;
+  padding: 0 11px;
+  border-radius: 999px;
+  background: var(--note-color);
+  color: var(--note-ink);
+  font-size: 21px;
+  font-weight: 900;
+}
+
+.case__count { font-size: 14px; font-weight: 800; color: #ffe082; }
+
+/* "Верно!" and "Нет, это …" float just under the bar for a while and go, so
+   the map never moves under a finger */
+.case__toast {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 50%;
+  width: max-content;
+  max-width: calc(100% - 32px);
+  padding: 6px 16px;
+  border: 1px solid rgba(255, 255, 255, .16);
+  border-radius: 999px;
+  background: rgba(22, 16, 54, .95);
+  box-shadow: var(--shadow);
+  font-size: 16px;
+  font-weight: 800;
+  text-align: center;
+  pointer-events: none;
+  opacity: 0;
+  transform: translate(-50%, -6px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.case__toast.is-shown { opacity: 1; transform: translate(-50%, 0); }
+
+/* "Дело №2: найди все ноты Соль" keeps to one line on a phone */
+@media (max-width: 420px) {
+  .case__task { font-size: 17px; }
+  .case__note { font-size: 19px; }
+}
+
+@media (max-width: 370px) {
+  .case__task { font-size: 16px; }
+  .case__toast { font-size: 15px; }
+}
+
+/* things in --cols columns, set by the game; every other one of a row stands
+   lower, so the dotted path between them winds */
+.map {
+  position: relative;
+  display: grid;
+  grid-template-columns: repeat(var(--cols, 2), minmax(0, 1fr));
+  align-items: start;
+  gap: 10px 16px;
+  margin-top: 12px;
+  padding-bottom: 8px;
+}
+
+.map__path {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+}
+
+.map__trail {
+  fill: none;
+  stroke: rgba(255, 224, 178, .6);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-dasharray: 1 12;
+}
+
+.place {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.place.is-low { margin-top: 22%; }
+
+.place__body { position: relative; display: block; transition: transform .15s ease; }
+
+.place__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 6px 8px rgba(10, 5, 35, .35));
+}
+
+/* a colouring book: cream things with dark outlines, until the note is found */
+.thing__body,
+.thing__detail {
+  fill: #FFF6E5;
+  stroke: #3a3357;
+  stroke-width: 2.5;
+  stroke-linejoin: round;
+  transition: fill .5s ease;
+}
+
+.thing__line { fill: none; stroke: #3a3357; stroke-width: 2.5; stroke-linecap: round; }
+.thing__line--thin { stroke-width: 1.6; }
+.thing__knob { fill: #3a3357; }
+.thing__stripe { fill: rgba(255, 255, 255, .5); }
+.thing__spot { fill: #fffdf5; stroke: #3a3357; stroke-width: 1.5; }
+.thing__wheel { fill: #4a4466; stroke: #3a3357; stroke-width: 2.5; }
+.place.is-found .thing__body { fill: var(--paint); }
+
+/* the window with the staff, at x 20…100 and y 40…112 of the 120 × 130 thing */
+.place__window {
+  position: absolute;
+  left: 16.667%;
+  top: 30.77%;
+  width: 66.667%;
+  height: 55.38%;
+  overflow: hidden;
+  border: 3px solid #3a3357;
+  border-radius: 8px;
+  background: #fffdf5;
+  transition: opacity .4s ease, transform .4s ease;
+}
+
+/* placed by hand: a percentage height inside a grid or a flow is not always
+   kept, and then a tall staff (the small octave) would spill out of the window */
+.place__window .staff { position: absolute; top: 4%; left: 0; width: 100%; height: 92%; overflow: visible; }
+
+/* the note is found: the window goes, and what it hid shows — the thing is
+   a whole picture now */
+.place.is-found .place__window { opacity: 0; transform: scale(.7); }
+.thing__inside { opacity: 0; transition: opacity .4s ease .1s; }
+.place.is-found .thing__inside { opacity: 1; }
+
+.place:active .place__body { transform: scale(.96); }
+.place.is-new .place__body { animation: pop .35s ease; }
+.place.is-found .place__body { animation: swing .8s ease-out; }
+.place.is-shaking .place__body { animation: shake .4s ease; }
 
 /* ---------- Players ---------- */
 

@@ -20,6 +20,7 @@ import orangeSlices from './orange-slices.js';
 import treeToys from './tree-toys.js';
 import pumpkins from './pumpkins.js';
 import berries from './berries.js';
+import detective from './detective.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -209,4 +210,5 @@ export const MODULES = [
   treeToys,
   pumpkins,
   berries,
+  detective,
 ];
