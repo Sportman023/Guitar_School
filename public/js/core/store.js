@@ -189,8 +189,12 @@ export const store = {
 
   // ---------- Results ----------
 
-  /** End of a game round: keep the best score and add the stars. */
-  finishRound(moduleId, { score, total }) {
+  /**
+   * End of a game round: keep the best score and add the stars. `passed` —
+   * the round was good enough to open the next game (js/core/locks.js);
+   * once a game is passed it stays passed.
+   */
+  finishRound(moduleId, { score, total, passed = false }) {
     const prev = state.modules[moduleId] || { best: 0, rounds: 0, lastScore: 0 };
     const before = state.stars || 0;
     const after = before + score;
@@ -204,6 +208,7 @@ export const store = {
           rounds: (prev.rounds || 0) + 1,
           lastScore: score,
           total,
+          passed: Boolean(prev.passed || passed),
         },
       },
     };

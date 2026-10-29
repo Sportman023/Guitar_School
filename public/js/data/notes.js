@@ -103,3 +103,6 @@ export const octaveName = (note) => octaveOf(note.octave).name;
 
 /** The octave on its own, for the brackets under the octave ladder. */
 export const octaveShort = (octave) => octaveOf(octave).short;
+
+/** Notes from more than one octave: then a name alone doesn't say which note it is. */
+export const isMixed = (notes) => new Set(notes.map((note) => note.octave)).size > 1;

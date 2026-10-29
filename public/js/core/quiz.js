@@ -12,9 +12,60 @@
 import { el, clear, shuffle, sample, delay, mount, topicHref } from './ui.js';
 import { NOTES } from '../data/notes.js';
 import { store } from './store.js';
+import { isPassed, opensNext, passMark } from './locks.js';
 import { playSuccess, playFail, playFanfare } from './audio.js';
 
 const PRAISE = ['Молодец! 🎉', 'Точно! ✨', 'Верно! 👏', 'Здорово! 🌟', 'Супер! 🎸'];
+
+/** A random word of praise for a right answer. */
+export function praise() {
+  return PRAISE[Math.floor(Math.random() * PRAISE.length)];
+}
+
+/**
+ * While the game after this one is still closed, the result says what the
+ * round did about it: opened it, or how many right answers it takes.
+ */
+function renderNextGame(next, { passed, total }) {
+  if (passed) {
+    return el('a', { class: 'result__opened', href: `#${next.id}`, style: `--accent:${next.accent}` },
+      el('span', { class: 'result__opened-title' }, '🔓 Открылась новая игра!'),
+      el('span', null, `${next.emoji} «${next.title}» — играть →`));
+  }
+  return el('div', { class: 'result__goal' },
+    `🔒 Чтобы открылась игра «${next.title}», нужно хотя бы ${passMark(total)} из ${total}. Попробуй ещё раз!`);
+}
+
+/**
+ * The end of a round: keeps the score and the stars, plays a fanfare for a
+ * perfect round, and returns the card with the score, "Ещё раз" and "В меню".
+ */
+export function renderRoundResult({ id, group, score, total, onRestart }) {
+  const best = store.moduleBest(id);
+  const next = opensNext(id);
+  const nextClosed = next && !isPassed(id);
+  const passed = score >= passMark(total);
+  store.finishRound(id, { score, total, passed });
+  const isPerfect = score === total;
+  if (isPerfect) playFanfare();
+  else playSuccess();
+
+  return el('div', { class: 'result' },
+    el('div', { class: 'result__emoji' }, isPerfect ? '🏆' : score >= total * 0.7 ? '🌟' : '🎸'),
+    el('div', { class: 'result__score' }, `${score} из ${total}`),
+    el('div', { class: 'result__text' },
+      isPerfect ? 'Идеально! Все ответы верные!'
+        : score >= total * 0.7 ? 'Отличная работа!'
+          : 'Хорошо, давай ещё разок!'),
+    best && best.best > score ? el('div', { class: 'result__best' }, `Лучший результат: ${best.best}`) : null,
+    el('div', { class: 'result__stars' }, '⭐'.repeat(Math.max(1, Math.round(score / 2)))),
+    nextClosed ? renderNextGame(next, { passed, total }) : null,
+    el('div', { class: 'row' },
+      el('button', { class: 'btn btn--primary', type: 'button', onclick: onRestart }, 'Ещё раз'),
+      el('a', { class: 'btn', href: topicHref(group) }, 'В меню'),
+    ),
+  );
+}
 
 /**
  * Wrong options that always include the answer's "twin" — another item with
@@ -30,7 +81,8 @@ export function pickWithTwin(key) {
   };
 }
 
-function buildQueue(notes, count) {
+/** `count` notes in random order, every note of the set about equally often. */
+export function buildQueue(notes, count) {
   const queue = [];
   while (queue.length < count) queue.push(...shuffle(notes));
   return queue.slice(0, count);
@@ -170,7 +222,7 @@ export function createQuiz(config) {
 
         if (isCorrect) {
           score += 1;
-          feedback.textContent = PRAISE[Math.floor(Math.random() * PRAISE.length)];
+          feedback.textContent = praise();
           feedback.className = 'feedback feedback--good';
           playSuccess();
         } else {
@@ -188,29 +240,8 @@ export function createQuiz(config) {
       }
 
       function renderResult() {
-        const best = store.moduleBest(id);
-        store.finishRound(id, { score, total: queue.length });
-        const isPerfect = score === queue.length;
-        if (isPerfect) playFanfare();
-        else playSuccess();
-
         clear(screen);
-        screen.append(
-          el('div', { class: 'result' },
-            el('div', { class: 'result__emoji' }, isPerfect ? '🏆' : score >= queue.length * 0.7 ? '🌟' : '🎸'),
-            el('div', { class: 'result__score' }, `${score} из ${queue.length}`),
-            el('div', { class: 'result__text' },
-              isPerfect ? 'Идеально! Все ответы верные!'
-                : score >= queue.length * 0.7 ? 'Отличная работа!'
-                  : 'Хорошо, давай ещё разок!'),
-            best && best.best > score ? el('div', { class: 'result__best' }, `Лучший результат: ${best.best}`) : null,
-            el('div', { class: 'result__stars' }, '⭐'.repeat(Math.max(1, Math.round(score / 2)))),
-            el('div', { class: 'row' },
-              el('button', { class: 'btn btn--primary', type: 'button', onclick: restart }, 'Ещё раз'),
-              el('a', { class: 'btn', href: topicHref(group) }, 'В меню'),
-            ),
-          ),
-        );
+        screen.append(renderRoundResult({ id, group, score, total: queue.length, onRestart: restart }));
       }
 
       renderQuestion();

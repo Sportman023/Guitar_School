@@ -7,6 +7,8 @@
 // explains something, without a game, also sets kind: 'learn' — then the menu
 // shows a tag instead of a score. A section added to an existing topic gets
 // "Новое!" on the topic tile and on its own card until the topic is opened.
+// A topic with inOrder: true opens its games one by one, in the order of
+// MODULES (see js/core/locks.js).
 
 import learn from './learn.js';
 import rainbow from './rainbow.js';
@@ -16,25 +18,23 @@ import octave1 from './octave1.js';
 import octave2 from './octave2.js';
 import octaveSmall from './octave-small.js';
 import octaves from './octaves.js';
+import orangeSlices from './orange-slices.js';
+import treeToys from './tree-toys.js';
+import pumpkins from './pumpkins.js';
+import berries from './berries.js';
+import detective from './detective.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
 import { createQuiz, pickWithTwin } from '../core/quiz.js';
 import { el, noteBubble, colorBubble, noteStyle } from '../core/ui.js';
 import { playPiano } from '../core/piano.js';
-import { NOTE_BY_ID, octaveName } from '../data/notes.js';
+import { NOTE_BY_ID, isMixed, octaveName } from '../data/notes.js';
 
 // Topics of the home screen, in the order they are taught at school.
 // A new topic goes to the end of the list, so what is being learned now
 // is always the last tile.
 export const GROUPS = [
-  {
-    id: 'colors',
-    title: 'Ноты и цвета',
-    subtitle: 'Семь нот — семь цветов радуги',
-    emoji: '🎨',
-    accent: '#FF7043',
-  },
   {
     id: 'hands',
     title: 'Пальцы',
@@ -43,11 +43,26 @@ export const GROUPS = [
     accent: '#00ACC1',
   },
   {
+    id: 'colors',
+    title: 'Ноты и цвета',
+    subtitle: 'Семь нот — семь цветов радуги',
+    emoji: '🎨',
+    accent: '#FF7043',
+  },
+  {
     id: 'staff',
     title: 'Нотный стан',
     subtitle: 'Ноты малой, первой и второй октавы',
     emoji: '🎼',
     accent: '#5C6BC0',
+  },
+  {
+    id: 'note-games',
+    title: 'Игры по ноткам',
+    subtitle: 'Играем с нотами на стане',
+    emoji: '🎶',
+    accent: '#FB8C00',
+    inOrder: true,
   },
 ];
 
@@ -127,8 +142,6 @@ function namePrompt(label, note) {
 // Every picture of a round is as big as the picked octaves need, so the staff
 // stays put while the questions go by.
 
-const isMixed = (notes) => new Set(notes.map((note) => note.octave)).size > 1;
-
 // Reading notes on the staff. Note heads follow the shared "coloured notes"
 // setting: colour is a hint here (red head → C), and the answers are words,
 // otherwise the child could match colour to colour without reading the staff.
@@ -179,15 +192,15 @@ const noteToStaff = createQuiz({
 });
 
 export const MODULES = [
+  fingers,
+  fingerToMark,
+  markToFinger,
+
   learn,
   noteToColor,
   colorToNote,
   rainbow,
   listenAndGuess,
-
-  fingers,
-  fingerToMark,
-  markToFinger,
 
   octave1,
   octave2,
@@ -195,4 +208,10 @@ export const MODULES = [
   octaves,
   staffToNote,
   noteToStaff,
+
+  orangeSlices,
+  treeToys,
+  pumpkins,
+  berries,
+  detective,
 ];
