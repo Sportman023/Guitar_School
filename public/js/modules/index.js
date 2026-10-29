@@ -7,6 +7,8 @@
 // explains something, without a game, also sets kind: 'learn' — then the menu
 // shows a tag instead of a score. A section added to an existing topic gets
 // "Новое!" on the topic tile and on its own card until the topic is opened.
+// A topic with inOrder: true opens its games one by one, in the order of
+// MODULES (see js/core/locks.js).
 
 import learn from './learn.js';
 import rainbow from './rainbow.js';
@@ -60,6 +62,7 @@ export const GROUPS = [
     subtitle: 'Играем с нотами на стане',
     emoji: '🎶',
     accent: '#FB8C00',
+    inOrder: true,
   },
 ];
 

@@ -5,8 +5,9 @@
 // being looked for, and the thing is painted in that note's colour (Ре
 // orange, Ля blue …), as in a colouring book, and the note sounds. A wrong
 // one shakes, and the child is told which note it is. A round is three cases
-// in turn, each for a note of its own picked at random, with a fresh map; two
-// or three things of the eight hide the note.
+// in turn, each for a note of its own picked at random, with a fresh map; three
+// or four things of the eight hide the note: ten in a round, as in every game
+// of the topic.
 //
 // The note heads are always black: a coloured head would show where the note
 // hides, and the staff wouldn't have to be read. As in "Pick the berries",
@@ -18,7 +19,7 @@
 // squeezed into the screen: there are two things in a row on a phone, and the
 // map scrolls under the case bar, which stays in sight.
 
-import { el, clear, mount, sample, shuffle, svgEl, delay, noteStyle } from '../core/ui.js';
+import { el, clear, mount, shuffle, svgEl, delay, noteStyle } from '../core/ui.js';
 import { renderStaff, tightStaffBox } from '../core/staff.js';
 import { octaveChips, drilledNotes } from '../core/controls.js';
 import { praise, renderRoundResult, buildQueue } from '../core/quiz.js';
@@ -32,8 +33,9 @@ const GROUP = 'note-games';
 const ACCENT = '#5E35B1';
 const CASES = 3;
 const PLACES = 8;
-// how many of the eight things may hide the note
-const HIDDEN = [2, 3];
+// how many of the eight things hide the note, for the cases of a round in
+// random order: ten in all
+const HIDDEN = [3, 3, 4];
 // things in a row: as many as fit at this width, but at least two and at most four
 const MIN_PLACE = 150;
 const COLUMNS = [2, 4];
@@ -384,10 +386,11 @@ export default {
       pool = drilledNotes();
       // only names that the picked octaves have: the small octave starts at Ми
       const names = shuffle(NOTES.filter((name) => pool.some((note) => note.pc === name.pc))).slice(0, CASES);
-      cases = names.map((target) => {
+      const counts = shuffle(HIDDEN);
+      cases = names.map((target, i) => {
         const right = pool.filter((note) => note.pc === target.pc);
         const wrong = pool.filter((note) => note.pc !== target.pc);
-        const [count] = sample(HIDDEN, 1);
+        const count = counts[i];
         const notes = shuffle([...buildQueue(right, count), ...buildQueue(wrong, PLACES - count)]);
         const things = shuffle(THINGS.map((_, i) => i));
         return { target, places: notes.map((note, i) => ({ note, thing: things[i], found: false })) };

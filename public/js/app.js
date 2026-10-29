@@ -1,5 +1,6 @@
 import { MODULES, GROUPS } from './modules/index.js';
 import { store } from './core/store.js';
+import { setOrder, lockedBy, gamesBefore, passMark } from './core/locks.js';
 import { el, clear, noteStyle, mount, topicHref } from './core/ui.js';
 import { NOTES } from './data/notes.js';
 import { ITEMS, nextUnlock, isUnlocked } from './data/guitar.js';
@@ -196,7 +197,31 @@ function renderResult(module) {
     [1, 2, 3].map((i) => el('span', { class: `stars__one ${i <= count ? '' : 'stars__one--off'}` }, '⭐')));
 }
 
+// the pass mark in words a child can count: 80% is "8 of 10"; the end of a
+// round names the exact number for its own length
+const PASS_RULE = `правильно было хотя бы ${passMark(10)} из 10`;
+
+/** A game that is still closed: which game opens it; a tap tells how. */
+function renderLockedCard(module, gate, isNew) {
+  return el('button', {
+    class: 'menu-card menu-card--locked',
+    type: 'button',
+    onclick: () => showLocked(module),
+  },
+    el('div', { class: 'menu-card__emoji' }, '🔒'),
+    el('div', { class: 'menu-card__text' },
+      el('div', { class: 'menu-card__title' },
+        module.title,
+        isNew ? el('span', { class: 'badge' }, 'Новое!') : null),
+      el('div', { class: 'menu-card__sub' }, `Откроется после игры «${gate.title}»`),
+      el('div', { class: 'tag' }, 'Как открыть?')),
+  );
+}
+
 function renderMenuCard(module, isNew) {
+  const gate = lockedBy(module.id);
+  if (gate) return renderLockedCard(module, gate, isNew);
+
   return el('a', {
     class: 'menu-card',
     href: `#${module.id}`,
@@ -226,6 +251,10 @@ function renderTopic(topic) {
 
   mount(appEl,
     el('p', { class: 'lead' }, topic.subtitle),
+    topic.items.some((module) => lockedBy(module.id))
+      ? el('p', { class: 'lock-note' },
+        `🔒 Игры открываются по очереди. Пройди игру так, чтобы ${PASS_RULE}, — и откроется следующая!`)
+      : null,
     el('div', { class: 'menu' }, topic.items.map((module) => renderMenuCard(module, isNew(module)))),
   );
 }
@@ -261,6 +290,11 @@ function render() {
     }
   } else {
     const screen = MODULES.find((m) => m.id === hash) || SCREENS.find((s) => s.id === hash);
+    if (screen && lockedBy(screen.id)) {
+      // a closed game, e.g. from an old bookmark: its topic tells how to open it
+      history.replaceState(null, '', topicHref(screen.group));
+      return render();
+    }
     if (screen) {
       renderSection(screen);
       return `#${screen.id}`;
@@ -292,11 +326,13 @@ function goHome() {
   else navigate();
 }
 
-// ---------- Celebrating unlocks ----------
+// ---------- Dialogs ----------
 
-function showUnlock(items) {
-  const { guitar } = store.state;
-
+/**
+ * A card over the screen that closes on Escape or a tap beside it.
+ * `build(close)` gives its contents, so its buttons can close it too.
+ */
+function showDialog(label, build) {
   function close() {
     overlay.remove();
     document.removeEventListener('keydown', onKey);
@@ -311,26 +347,77 @@ function showUnlock(items) {
       if (event.target === overlay) close();
     },
   },
-    el('div', { class: 'unlock', role: 'dialog', 'aria-modal': 'true', 'aria-label': 'Открылось новое для гитары' },
-      el('div', { class: 'unlock__emoji' }, '🎁'),
-      el('div', { class: 'unlock__title' }, 'Открылось новое для гитары!'),
-      el('div', { class: 'unlock__items' },
-        items.map((item) => el('div', { class: 'unlock__item' },
-          el('div', { class: 'unlock__preview' }, itemPreview(item, guitar)),
-          el('div', { class: 'unlock__name' }, itemTitle(item))))),
-      el('div', { class: 'row row--center' },
-        el('button', {
-          class: 'btn btn--primary',
-          type: 'button',
-          onclick: () => {
-            close();
-            location.hash = 'guitar';
-          },
-        }, 'Украсить гитару'),
-        el('button', { class: 'btn', type: 'button', onclick: close }, 'Потом'))));
+    el('div', { class: 'unlock', role: 'dialog', 'aria-modal': 'true', 'aria-label': label }, build(close)));
 
   document.addEventListener('keydown', onKey);
   document.body.append(overlay);
+}
+
+/**
+ * Why a game is closed, with a way straight to the game that can be played
+ * now. When the game before it is closed too, the dialog lists every game on
+ * the way, so it never sends the child to a game that won't open.
+ */
+function showLocked(module) {
+  const path = gamesBefore(module.id);
+  const [now] = path;
+  const title = `Игра «${module.title}» пока закрыта`;
+  const explain = path.length === 1
+    ? [el('p', { class: 'unlock__text' },
+      `Сначала пройди игру «${now.title}». Нужно, чтобы ${PASS_RULE}. Тогда эта игра откроется!`)]
+    : [
+      el('p', { class: 'unlock__text' }, 'Игры открываются по очереди. Чтобы дойти до этой, пройди одну за другой:'),
+      el('ol', { class: 'unlock__path' },
+        path.map((game) => el('li', {
+          class: `unlock__step ${game === now ? 'unlock__step--now' : ''}`,
+          style: `--accent:${game.accent}`,
+        },
+          el('span', null, `${game.emoji} ${game.title}`),
+          el('span', { class: 'unlock__mark' }, game === now ? 'можно играть' : '🔒')))),
+      el('p', { class: 'unlock__text' }, `В каждой нужно, чтобы ${PASS_RULE}.`),
+    ];
+
+  showDialog(title, (close) => [
+    el('div', { class: 'unlock__emoji' }, '🔒'),
+    el('div', { class: 'unlock__title' }, title),
+    ...explain,
+    el('div', { class: 'row row--center' },
+      el('button', {
+        class: 'btn btn--primary',
+        type: 'button',
+        style: `--accent:${now.accent}`,
+        onclick: () => {
+          close();
+          location.hash = now.id;
+        },
+      }, `${now.emoji} Играть в «${now.title}»`),
+      el('button', { class: 'btn', type: 'button', onclick: close }, 'Понятно')),
+  ]);
+}
+
+// ---------- Celebrating unlocks ----------
+
+function showUnlock(items) {
+  const { guitar } = store.state;
+
+  showDialog('Открылось новое для гитары', (close) => [
+    el('div', { class: 'unlock__emoji' }, '🎁'),
+    el('div', { class: 'unlock__title' }, 'Открылось новое для гитары!'),
+    el('div', { class: 'unlock__items' },
+      items.map((item) => el('div', { class: 'unlock__item' },
+        el('div', { class: 'unlock__preview' }, itemPreview(item, guitar)),
+        el('div', { class: 'unlock__name' }, itemTitle(item))))),
+    el('div', { class: 'row row--center' },
+      el('button', {
+        class: 'btn btn--primary',
+        type: 'button',
+        onclick: () => {
+          close();
+          location.hash = 'guitar';
+        },
+      }, 'Украсить гитару'),
+      el('button', { class: 'btn', type: 'button', onclick: close }, 'Потом')),
+  ]);
   playFanfare();
 }
 
@@ -338,6 +425,8 @@ function showUnlock(items) {
 store.onUnlock((items) => setTimeout(() => showUnlock(items), 1100));
 
 // ---------- Start ----------
+
+setOrder(topics());
 
 backBtn.addEventListener('click', () => {
   location.hash = parentRoute;

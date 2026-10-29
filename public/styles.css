@@ -205,6 +205,33 @@ main {
 .menu-card__title { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; font-size: 18px; font-weight: 800; }
 .menu-card__sub { font-size: 14px; color: var(--muted); margin-top: 2px; }
 
+/* a game that opens later: grey and faded, a button that tells how to open it */
+.menu-card--locked {
+  --accent: #9C97B0;
+  width: 100%;
+  border: 0;
+  border-left: 8px solid var(--accent);
+  background: rgba(255, 255, 255, .72);
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.menu-card--locked .menu-card__emoji { font-size: 26px; }
+
+/* why some games of a topic are closed */
+.lock-note {
+  margin: -4px 0 16px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .1);
+  color: rgba(255, 255, 255, .9);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-align: center;
+}
+
 /* "Учим" / "Ещё не играли" — the accent darkened, so a light accent stays readable */
 .tag {
   display: inline-block;
@@ -421,6 +448,34 @@ main {
 .result__text { color: rgba(255, 255, 255, .75); }
 .result__best { font-size: 14px; color: #ffe082; }
 .result__stars { font-size: 22px; letter-spacing: 2px; }
+
+/* the next game of the topic: opened by this round, or what it takes */
+.result__opened {
+  display: grid;
+  gap: 4px;
+  margin-top: 8px;
+  padding: 14px 18px;
+  border-radius: 18px;
+  background: var(--accent);
+  color: #fff;
+  font-weight: 800;
+  text-decoration: none;
+  animation: pop .3s ease;
+}
+
+.result__opened-title { font-size: 19px; font-weight: 900; }
+.result__opened:active { transform: scale(.97); }
+
+.result__goal {
+  max-width: 420px;
+  margin-top: 8px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .1);
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+}
 
 .row { display: flex; gap: 12px; flex-wrap: wrap; margin-top: 16px; }
 .row--center { justify-content: center; margin-top: 22px; }
@@ -2132,6 +2187,32 @@ main {
 
 .unlock__emoji { font-size: 56px; animation: bounce 1s ease-in-out infinite; }
 .unlock__title { margin: 4px 0 16px; font-size: 22px; font-weight: 900; }
+.unlock__text { margin: -4px 0 0; font-size: 17px; line-height: 1.45; }
+
+/* the games to pass on the way to a closed one; the first can be played now */
+.unlock__path { display: grid; gap: 6px; margin: 12px 0 16px; padding: 0; list-style: none; }
+
+.unlock__step {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 14px;
+  background: var(--tint);
+  color: var(--muted);
+  font-weight: 800;
+  text-align: left;
+}
+
+.unlock__step--now {
+  background: color-mix(in srgb, var(--accent) 14%, white);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--accent);
+}
+
+.unlock__mark { flex: none; font-size: 13px; }
+.unlock__step--now .unlock__mark { color: color-mix(in srgb, var(--accent) 60%, var(--ink)); }
 .unlock__items { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; }
 .unlock__item { display: grid; justify-items: center; gap: 6px; width: 130px; }
 

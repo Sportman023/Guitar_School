@@ -37,10 +37,10 @@ import { NOTES, isMixed, octaveName } from '../data/notes.js';
 const ID = 'pumpkins';
 const GROUP = 'note-games';
 const ACCENT = '#F4511E';
-// pumpkins of a round, as many as on the sheet; the leaves are one more
-const PUMPKINS = 8;
-// columns × rows: every grid has at least 8 black squares and 9 white ones
-const GRIDS = [[3, 6], [4, 5], [5, 4], [6, 3]];
+// pumpkins of a round: ten, as in every game of the topic; the leaves are one more
+const PUMPKINS = 10;
+// columns × rows: every grid has at least 10 black squares and 11 white ones
+const GRIDS = [[3, 8], [4, 6], [5, 5], [6, 4], [8, 3]];
 // the gap between the squares, as in styles.css
 const GAP = 6;
 // a row is never lower than this, even on a short screen (then the page

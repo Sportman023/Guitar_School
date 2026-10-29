@@ -12,6 +12,7 @@
 import { el, clear, shuffle, sample, delay, mount, topicHref } from './ui.js';
 import { NOTES } from '../data/notes.js';
 import { store } from './store.js';
+import { isPassed, opensNext, passMark } from './locks.js';
 import { playSuccess, playFail, playFanfare } from './audio.js';
 
 const PRAISE = ['Молодец! 🎉', 'Точно! ✨', 'Верно! 👏', 'Здорово! 🌟', 'Супер! 🎸'];
@@ -22,12 +23,29 @@ export function praise() {
 }
 
 /**
+ * While the game after this one is still closed, the result says what the
+ * round did about it: opened it, or how many right answers it takes.
+ */
+function renderNextGame(next, { passed, total }) {
+  if (passed) {
+    return el('a', { class: 'result__opened', href: `#${next.id}`, style: `--accent:${next.accent}` },
+      el('span', { class: 'result__opened-title' }, '🔓 Открылась новая игра!'),
+      el('span', null, `${next.emoji} «${next.title}» — играть →`));
+  }
+  return el('div', { class: 'result__goal' },
+    `🔒 Чтобы открылась игра «${next.title}», нужно хотя бы ${passMark(total)} из ${total}. Попробуй ещё раз!`);
+}
+
+/**
  * The end of a round: keeps the score and the stars, plays a fanfare for a
  * perfect round, and returns the card with the score, "Ещё раз" and "В меню".
  */
 export function renderRoundResult({ id, group, score, total, onRestart }) {
   const best = store.moduleBest(id);
-  store.finishRound(id, { score, total });
+  const next = opensNext(id);
+  const nextClosed = next && !isPassed(id);
+  const passed = score >= passMark(total);
+  store.finishRound(id, { score, total, passed });
   const isPerfect = score === total;
   if (isPerfect) playFanfare();
   else playSuccess();
@@ -41,6 +59,7 @@ export function renderRoundResult({ id, group, score, total, onRestart }) {
           : 'Хорошо, давай ещё разок!'),
     best && best.best > score ? el('div', { class: 'result__best' }, `Лучший результат: ${best.best}`) : null,
     el('div', { class: 'result__stars' }, '⭐'.repeat(Math.max(1, Math.round(score / 2)))),
+    nextClosed ? renderNextGame(next, { passed, total }) : null,
     el('div', { class: 'row' },
       el('button', { class: 'btn btn--primary', type: 'button', onclick: onRestart }, 'Ещё раз'),
       el('a', { class: 'btn', href: topicHref(group) }, 'В меню'),

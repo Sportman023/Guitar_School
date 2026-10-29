@@ -2,17 +2,19 @@
 // staff stand in one column, orange slices with note names in the other, and
 // a hamster on top wants every slice. Tap a staff and then its slice (or the
 // slice first): a right pair sounds the note on the piano, the slice goes into
-// the hamster's cheeks and the next note takes the staff's place. The round is
-// over when every note of the picked octaves has found its slice, and by then
-// the cheeks are as round as they get.
+// the hamster's cheeks and the next note takes the staff's place. A round is
+// ten notes of the picked octaves, and by its end the cheeks are as round as
+// they get. The notes are all different when the octaves have ten or more;
+// with fewer some come twice, but a note never stands on the board twice at
+// once — pairs are told by the note.
 //
 // There is always one slice too many, so the last notes still have to be
 // read instead of taking whatever is left. The extra slice belongs to the
 // note that comes next: when that note takes a free place, its slice is on
 // the board already, and the slice that appears then is for a later note.
 // So a slice that has just appeared is never the one for the staff that has
-// just appeared. Once no notes are left to come, the extra slice is one the
-// hamster has already had.
+// just appeared. Once no notes are left to come, the extra slice is just one
+// more note of the octaves.
 //
 // The notes and how they look are shared with the staff games: the octave
 // chips and the "coloured notes" toggle. With several octaves the slices name
@@ -33,8 +35,11 @@ import { isMixed, octaveName } from '../data/notes.js';
 const ID = 'orange-slices';
 const GROUP = 'note-games';
 const ACCENT = '#FB8C00';
-// staves on the board at a time; the slices are one more
+// staves on the board at a time; the slices are one more, so the board takes
+// five different notes — as many as the smallest octave has
 const PLACES = 4;
+// notes in a round: as in the other games, so "8 of 10" means the same everywhere
+const ROUND_NOTES = 10;
 
 const sliceOf = (note) => ({ note, tilt: Math.round(Math.random() * 20 - 10) });
 
@@ -109,7 +114,8 @@ export default {
     root.append(screen);
 
     let pool;
-    // every note of the round in the order they come onto the board
+    // the notes of the round in the order they come onto the board, drawn
+    // one by one when they are needed (see drawNote)
     let queue;
     // the next note of the queue to take a free place
     let cursor;
@@ -151,14 +157,33 @@ export default {
       if (next) screen.querySelector(`[data-${next.type}="${next.id}"]`)?.classList.add('is-selected');
     }
 
+    /** Notes of the octaves that are not on the board, as a staff or as a slice. */
+    function offBoard() {
+      const onBoard = [...staves, ...slices.map((slot) => slot && slot.note)];
+      return pool.filter((note) => !onBoard.includes(note));
+    }
+
     /**
-     * The extra slice once no notes are left to come: a note the animal has
-     * already had, if possible not the one it has just got, and the twin of a
-     * staff on the board when there is one.
+     * The next note of the round: one that is not on the board, and of those
+     * one that has come the fewest times, so the ten are all different when
+     * the octaves have that many notes, and otherwise repeat about evenly.
+     */
+    function drawNote() {
+      const free = offBoard();
+      const times = (note) => queue.filter((item) => item === note).length;
+      const fewest = Math.min(...free.map(times));
+      const [note] = sample(free.filter((item) => times(item) === fewest), 1);
+      queue.push(note);
+      return note;
+    }
+
+    /**
+     * The extra slice once no notes are left to come: a note that is not on
+     * the board, if possible not the one the animal has just got, and the twin
+     * of a staff on the board when there is one.
      */
     function decoy(skip) {
-      const onBoard = [...staves, ...slices.map((slot) => slot && slot.note)];
-      const free = pool.filter((note) => !onBoard.includes(note));
+      const free = offBoard();
       const others = free.filter((note) => note !== skip);
       const candidates = others.length ? others : free;
       const twins = candidates.filter((note) => staves.some((staff) => staff && staff.pc === note.pc));
@@ -169,7 +194,7 @@ export default {
     function renderProgress() {
       return el('div', { class: 'progress' },
         el('div', { class: 'progress__dots' },
-          queue.map((_, i) => el('span', { class: `dot ${i < matched ? 'dot--done' : ''}` }))),
+          Array.from({ length: ROUND_NOTES }, (_, i) => el('span', { class: `dot ${i < matched ? 'dot--done' : ''}` }))),
         el('div', { class: 'progress__score' }, `⭐ ${score}`),
       );
     }
@@ -211,10 +236,10 @@ export default {
       clear(screen);
       const colored = store.setting('coloredHeads', true);
       const box = staffBox(pool);
-      const isOver = matched === queue.length;
+      const isOver = matched === ROUND_NOTES;
 
       view = {
-        animal: el('div', { class: 'pairs__animal', style: cheeks(matched / queue.length) }, renderHamster()),
+        animal: el('div', { class: 'pairs__animal', style: cheeks(matched / ROUND_NOTES) }, renderHamster()),
         feedback: el('div', { class: `feedback ${message ? `feedback--${message.kind}` : ''}` }, message ? message.text : ' '),
         lines: svgEl('svg', { class: 'pairs__lines', 'aria-hidden': 'true' }),
       };
@@ -230,8 +255,8 @@ export default {
         el('div', { class: 'pairs__head' },
           el('div', { class: 'pairs__who' },
             view.animal,
-            el('div', { class: 'pairs__basket', 'aria-label': `Собрано ${matched} долек из ${queue.length}` },
-              `🍊 ${matched} из ${queue.length}`)),
+            el('div', { class: 'pairs__basket', 'aria-label': `Собрано ${matched} долек из ${ROUND_NOTES}` },
+              `🍊 ${matched} из ${ROUND_NOTES}`)),
           el('div', { class: 'pairs__task' },
             'Помоги хомячку собрать все дольки: нажми на ноту, потом на её дольку. Одна долька лишняя!')),
         view.feedback,
@@ -249,12 +274,14 @@ export default {
     /** A fresh round — "Ещё раз", or octave chips that changed the set of notes. */
     function restart() {
       pool = drilledNotes();
-      queue = shuffle(pool);
-      staves = queue.slice(0, PLACES);
-      cursor = staves.length;
+      queue = [];
+      staves = [];
       slices = [];
-      const extra = queue[cursor] || decoy(null);
-      slices = shuffle([...staves, extra].filter(Boolean)).map(sliceOf);
+      while (staves.length < PLACES) staves.push(drawNote());
+      cursor = staves.length;
+      // the extra slice: the note that comes next
+      const extra = drawNote();
+      slices = shuffle([...staves, extra]).map(sliceOf);
       matched = 0;
       score = 0;
       tried = new Set();
@@ -305,6 +332,8 @@ export default {
       locked = true;
       const current = round;
       matched += 1;
+      // the same note may come again later, and then it is a new try
+      tried.delete(note.id);
       select(null);
       playPiano(note.freq);
       say(praise(), 'good');
@@ -316,18 +345,18 @@ export default {
       const place = staves.indexOf(note);
       const slicePlace = slices.findIndex((slot) => slot && slot.note === note);
       slices[slicePlace] = null;
-      if (cursor < queue.length) {
+      if (cursor < ROUND_NOTES) {
         // its slice is on the board already: it was the extra one
         staves[place] = queue[cursor];
         cursor += 1;
-        const extra = cursor < queue.length ? queue[cursor] : decoy(note);
+        const extra = cursor < ROUND_NOTES ? drawNote() : decoy(note);
         if (extra) slices[slicePlace] = sliceOf(extra);
         fresh = new Set([`staff:${staves[place].id}`, extra && `slice:${extra.id}`]);
       } else {
         staves[place] = null;
       }
 
-      const isOver = matched === queue.length;
+      const isOver = matched === ROUND_NOTES;
       if (isOver) say(slices.some(Boolean) ? 'Ням-ням! А эта долька — лишняя' : 'Ням-ням! Все дольки у хомячка', 'good');
       render();
       if (!isOver) {
@@ -339,7 +368,7 @@ export default {
       if (cancelled || current !== round) return;
       locked = false;
       clear(screen);
-      screen.append(renderRoundResult({ id: ID, group: GROUP, score, total: queue.length, onRestart: restart }));
+      screen.append(renderRoundResult({ id: ID, group: GROUP, score, total: ROUND_NOTES, onRestart: restart }));
     }
 
     /** A line joins the pair, then the slice flies to the hamster and the staff fades. */
@@ -373,7 +402,7 @@ export default {
       ).finished.catch(() => {});
       // the slice is in: the cheeks swell on the hamster on display, so the
       // board drawn next has them as big already
-      animal.setAttribute('style', cheeks(matched / queue.length));
+      animal.setAttribute('style', cheeks(matched / ROUND_NOTES));
       animal.animate(
         [{ transform: 'scale(1)' }, { transform: 'scale(1.3)' }, { transform: 'scale(1)' }],
         { duration: 300, easing: 'ease-out' },

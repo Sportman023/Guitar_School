@@ -3,8 +3,8 @@
 // a note name on it. Only the berries with that note go into the basket: tap a
 // berry and it hops in, or carry it there with a finger. A wrong berry stays
 // where it grew. A round is three baskets in turn, each for a note of its own
-// picked at random, with a fresh field of nine berries, two to four of which
-// are the right ones.
+// picked at random, with a fresh field of nine berries, three or four of
+// which are the right ones: ten in a round, as in every game of the topic.
 //
 // As in "Pumpkins and leaves", the basket carries the name only: that note in
 // any of the octaves picked on the chips goes in. The note heads follow the
@@ -17,7 +17,7 @@
 // A finger carrying a berry can't scroll the page, so the berries and the
 // basket fit the screen below the controls, as in the pumpkin game.
 
-import { el, clear, mount, sample, shuffle, svgEl, delay } from '../core/ui.js';
+import { el, clear, mount, shuffle, svgEl, delay } from '../core/ui.js';
 import { renderStaff, tightStaffBox } from '../core/staff.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { praise, renderRoundResult, buildQueue } from '../core/quiz.js';
@@ -31,8 +31,9 @@ const GROUP = 'note-games';
 const ACCENT = '#D81B60';
 const BASKETS = 3;
 const BERRIES = 9;
-// how many of the nine berries may be the right ones
-const RIGHT = [2, 3, 4];
+// how many of the nine berries are the right ones, for the baskets of a
+// round in random order: ten in all
+const RIGHT = [3, 3, 4];
 // berries stand in rows of three, or of five and four as on the sheet;
 // the one with the bigger berries is taken
 const COLUMNS = [3, 5];
@@ -267,10 +268,11 @@ export default {
       pool = drilledNotes();
       // only names that the picked octaves have: the small octave starts at Ми
       const names = shuffle(NOTES.filter((name) => pool.some((note) => note.pc === name.pc))).slice(0, BASKETS);
-      baskets = names.map((target) => {
+      const counts = shuffle(RIGHT);
+      baskets = names.map((target, i) => {
         const right = pool.filter((note) => note.pc === target.pc);
         const wrong = pool.filter((note) => note.pc !== target.pc);
-        const [count] = sample(RIGHT, 1);
+        const count = counts[i];
         const notes = shuffle([...buildQueue(right, count), ...buildQueue(wrong, BERRIES - count)]);
         return { target, berries: notes.map((note) => ({ note, picked: false })) };
       });
