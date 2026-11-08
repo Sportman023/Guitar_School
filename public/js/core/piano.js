@@ -76,12 +76,13 @@ const distance = (freq, sample) => Math.abs(Math.log(freq / sample.freq));
 
 /**
  * Presses a key. `delay` is in seconds: notes started together keep their
- * rhythm even if the recordings are still downloading.
+ * rhythm even if the recordings are still downloading. Resolves to a function
+ * that lets the key go early (a rhythm stopped halfway, see core/rhythm.js).
  */
 export async function playPiano(freq, { duration = 1.8, volume = 1.5, delay = 0 } = {}) {
   const samples = await loadPiano();
   const ac = ensureAudio();
-  if (!samples || !ac) return;
+  if (!samples || !ac) return () => {};
 
   const sample = samples.reduce((best, item) => (distance(freq, item) < distance(freq, best) ? item : best));
   const source = ac.createBufferSource();
@@ -99,6 +100,18 @@ export async function playPiano(freq, { duration = 1.8, volume = 1.5, delay = 0 
   source.connect(gain).connect(ac.destination);
   source.start(start);
   source.stop(end + RELEASE);
+
+  return () => {
+    const now = ac.currentTime;
+    gain.gain.cancelScheduledValues(now);
+    gain.gain.setValueAtTime(Math.max(gain.gain.value, 0.0001), now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+    try {
+      source.stop(now + 0.1);
+    } catch {
+      // already stopped
+    }
+  };
 }
 
 /** Plays the notes one by one, each key held until the next one. `step` is in seconds. */
