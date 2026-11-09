@@ -559,6 +559,9 @@ main {
 @media (min-width: 620px) {
   .options--colors { grid-template-columns: repeat(4, 1fr); }
   .menu { grid-template-columns: repeat(2, 1fr); }
+  /* a row of a topic (`rows` in js/modules/index.js) starts on a new line,
+     leaving the second column of the line before empty */
+  .menu-card--row-start { grid-column-start: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {

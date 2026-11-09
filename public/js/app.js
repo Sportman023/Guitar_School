@@ -255,8 +255,25 @@ function renderTopic(topic) {
       ? el('p', { class: 'lock-note' },
         `🔒 Игры открываются по очереди. Пройди игру так, чтобы ${PASS_RULE}, — и откроется следующая!`)
       : null,
-    el('div', { class: 'menu' }, topic.items.map((module) => renderMenuCard(module, isNew(module)))),
+    el('div', { class: 'menu' }, menuRows(topic).flatMap((row) => row.map((module, i) => {
+      const card = renderMenuCard(module, isNew(module));
+      if (i === 0) card.classList.add('menu-card--row-start');
+      return card;
+    }))),
   );
+}
+
+/**
+ * The sections of a topic split into its rows (`rows` in js/modules/index.js);
+ * sections not named there make a last row. A topic without rows is one row.
+ */
+function menuRows(topic) {
+  if (!topic.rows) return [topic.items];
+  const byId = new Map(topic.items.map((module) => [module.id, module]));
+  const rows = topic.rows.map((ids) => ids.map((id) => byId.get(id)).filter(Boolean));
+  const named = new Set(topic.rows.flat());
+  rows.push(topic.items.filter((module) => !named.has(module.id)));
+  return rows.filter((row) => row.length);
 }
 
 // ---------- Routing ----------

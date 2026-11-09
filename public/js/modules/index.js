@@ -8,7 +8,10 @@
 // shows a tag instead of a score. A section added to an existing topic gets
 // "Новое!" on the topic tile and on its own card until the topic is opened.
 // A topic with inOrder: true opens its games one by one, in the order of
-// MODULES (see js/core/locks.js).
+// MODULES (see js/core/locks.js). A topic with `rows` groups its sections:
+// each row is a list of section ids and starts on a new line of the menu,
+// leaving the rest of the line before empty; sections not named in any row
+// go to a last row of their own.
 
 import learn from './learn.js';
 import rainbow from './rainbow.js';
@@ -74,6 +77,12 @@ export const GROUPS = [
     subtitle: 'Длительности, такт и размер',
     emoji: '🥁',
     accent: '#43A047',
+    // each lesson on a row of its own, followed by its games
+    rows: [
+      ['durations', 'duration-name', 'duration-tree'],
+      ['bars', 'count-bars'],
+      ['meters', 'guess-meter'],
+    ],
   },
 ];
 
@@ -227,10 +236,10 @@ export const MODULES = [
   detective,
 
   durations,
-  bars,
-  meters,
   durationName,
   durationTree,
+  bars,
   countBars,
+  meters,
   guessMeter,
 ];
