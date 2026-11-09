@@ -111,7 +111,8 @@ const lit = (start, length) => `${start},${length}`;
  *   counts    — the count under the notes: 1 2 3 for the beats, "и" for the
  *               second eighth, the beats a long note holds through greyed;
  *               'full' counts "1 и 2 и…" under every beat, as the duration
- *               tree does: "1 и" of a quarter share its one strip;
+ *               tree does: "1 и" of a quarter share its one strip, and every
+ *               note stands right above the word it starts on;
  *   cells     — a strip under every note as long as the note lasts;
  *   numbers   — a bracket with the number of the bar under every bar;
  *   beat      — how wide a quarter is;
@@ -171,9 +172,14 @@ export function renderRhythm(bars, {
     const barX = x + BAR_PAD;
     const length = barLength(bar);
     const notes = barNotes(bar);
+    // with the full count every note stands right above its own word ("1",
+    // "и"…), so a quarter sits on the first half of its slot
+    const xOf = (note) => (counts === 'full'
+      ? barX + (note.start + 0.25) * beat
+      : noteX(barX, note.start, note.length, beat));
 
     notes.forEach((note, i) => {
-      const nx = noteX(barX, note.start, note.length, beat);
+      const nx = xOf(note);
       const group = svgEl('g', {
         class: 'rhythm__note',
         'data-start': at + note.start,
@@ -195,7 +201,7 @@ export function renderRhythm(bars, {
       if (note.beam === 'first') {
         const next = notes[i + 1];
         const x1 = nx + STEM_DX - 0.9;
-        const x2 = noteX(barX, next.start, next.length, beat) + STEM_DX + 0.9;
+        const x2 = xOf(next) + STEM_DX + 0.9;
         layer.notes.push(svgEl('path', {
           d: `M${x1} ${STEM_TOP}H${x2}V${STEM_TOP + BEAM}H${x1}Z`,
           class: 'rhythm__beam',
