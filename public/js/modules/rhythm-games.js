@@ -275,7 +275,8 @@ export const countBars = createQuiz({
       "Сколько здесь тактов?",
       renderRhythm(question.bars, {
         meter: question.meter,
-        counts: showsCount(),
+        // "1 и 2 и…" with every beat, as in the duration tree
+        counts: showsCount() && "full",
       }),
     ),
   renderOption: (option) =>
