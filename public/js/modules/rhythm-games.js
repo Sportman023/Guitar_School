@@ -315,7 +315,8 @@ export const guessMeter = createQuiz({
       renderRhythm(question.bars, {
         meter: question,
         meterMark: "ask",
-        counts: showsCount(),
+        // "1 и 2 и…" with every beat, as in the duration tree
+        counts: showsCount() && "full",
       }),
     ),
   renderOption: (meter) =>

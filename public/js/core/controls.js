@@ -40,8 +40,8 @@ export function colorToggle(onChange) {
 }
 
 /**
- * The "count under the notes" toggle shared by the rhythm games: the beats
- * 1 2 3 under the staff and how long each note lasts. Off, the child counts
+ * The "count under the notes" toggle shared by the rhythm games: the count
+ * "1 и 2 и…" under the staff and how long each note lasts. Off, the child counts
  * by themselves.
  */
 export function countToggle(onChange) {
