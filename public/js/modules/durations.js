@@ -1,7 +1,8 @@
 // "Duration tree" section, after the card from school: a whole note splits
 // into 2 halves, 4 quarters and 8 eighths. The levels are drawn to scale, so
 // the notes of every level fill the same width, and each level plays on tap
-// with the count running underneath.
+// with the count running underneath: "1 и 2 и 3 и 4 и" on every level, so
+// the child sees how many counts each note holds.
 
 import { el } from '../core/ui.js';
 import { renderRhythm, noteGlyph, playRhythm, stopRhythm } from '../core/rhythm.js';
@@ -19,7 +20,7 @@ function treeLevel(level, index) {
   const picture = renderRhythm([bar], {
     staff: false,
     cells: true,
-    counts: true,
+    counts: 'full',
     beat: 40,
     startBeat: index * (4 + LEVEL_GAP),
     label: level.title,

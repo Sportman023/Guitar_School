@@ -110,6 +110,8 @@ const lit = (start, length) => `${start},${length}`;
  *   marked    — bar lines drawn in colour, to point at them;
  *   counts    — the count under the notes: 1 2 3 for the beats, "и" for the
  *               second eighth, the beats a long note holds through greyed;
+ *               'full' counts "1 и 2 и…" under every beat, as the duration
+ *               tree does: "1 и" of a quarter share its one strip;
  *   cells     — a strip under every note as long as the note lasts;
  *   numbers   — a bracket with the number of the bar under every bar;
  *   beat      — how wide a quarter is;
@@ -201,7 +203,24 @@ export function renderRhythm(bars, {
       }
     });
 
-    if (counts) {
+    if (counts === 'full') {
+      // every half of a beat gets its word, in the same places on every
+      // level of the tree; what a longer note holds through is greyed
+      for (let b = 0; b < length; b++) {
+        [[b, String(b + 1)], [b + 0.5, 'и']].forEach(([start, word]) => {
+          const kind = [
+            word === 'и' ? 'rhythm__count--and' : start === 0 ? 'rhythm__count--strong' : '',
+            notes.some((note) => note.start === start) ? '' : 'rhythm__count--held',
+          ].filter(Boolean).join(' ');
+          layer.marks.push(svgEl('text', {
+            x: barX + (start + 0.25) * beat,
+            y: countY,
+            class: `rhythm__count ${kind}`.trim(),
+            'data-lit': lit(at + start, 0.5),
+          }, word));
+        });
+      }
+    } else if (counts) {
       for (let b = 0; b < length; b++) {
         const starts = notes.find((note) => note.start === b);
         const cx = starts ? noteX(barX, b, starts.length, beat) : barX + (b + 0.5) * beat;
