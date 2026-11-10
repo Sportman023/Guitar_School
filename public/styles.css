@@ -559,6 +559,9 @@ main {
 @media (min-width: 620px) {
   .options--colors { grid-template-columns: repeat(4, 1fr); }
   .menu { grid-template-columns: repeat(2, 1fr); }
+  /* a row of a topic (`rows` in js/modules/index.js) starts on a new line,
+     leaving the second column of the line before empty */
+  .menu-card--row-start { grid-column-start: 1; }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -752,7 +755,8 @@ main {
   transition: transform .15s ease;
 }
 
-.toggle--on .toggle__dot { background: linear-gradient(90deg, #E53935, #FB8C00, #FDD835, #43A047, #29B6F6, #3949AB, #8E24AA); }
+.toggle--on .toggle__dot { background: #ffb300; }
+.toggle--rainbow.toggle--on .toggle__dot { background: linear-gradient(90deg, #E53935, #FB8C00, #FDD835, #43A047, #29B6F6, #3949AB, #8E24AA); }
 .toggle--on .toggle__dot::after { transform: translateX(12px); }
 
 /* ---------- Octave chips ---------- */
@@ -2242,4 +2246,321 @@ main {
 @keyframes pulse {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.08); }
+}
+
+/* ---------- Rhythm: notes, bars and time signatures ---------- */
+
+.rhythm {
+  --rhythm-ink: #1b1636;
+  --rhythm-on: var(--accent, #7E57C2);
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
+}
+
+.rhythm__head,
+.rhythm__flag,
+.rhythm__beam { fill: var(--rhythm-ink); stroke: none; transition: fill .1s ease; }
+.rhythm__stem { stroke: var(--rhythm-ink); stroke-width: 1.9; stroke-linecap: round; transition: stroke .1s ease; }
+.rhythm__cell { fill: color-mix(in srgb, var(--rhythm-on) 30%, transparent); transition: fill .1s ease; }
+
+.rhythm__bar { stroke: #1b1636; stroke-width: 1.4; }
+.rhythm__final { fill: #1b1636; }
+.rhythm__bar--marked { stroke: #F57C00; stroke-width: 2.6; }
+.rhythm__final--marked { fill: #F57C00; }
+
+/* the time signature: two digits on the staff, one above the other */
+.rhythm__meter {
+  fill: #1b1636;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 25px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+.rhythm__ask { fill: #FFF3D6; stroke: #F57C00; stroke-width: 1.5; stroke-dasharray: 3 2; }
+
+.rhythm__ask-text {
+  fill: #E65100;
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* the count under the notes; a beat a long note holds through is grey */
+.rhythm__count {
+  fill: #4a4466;
+  font-family: inherit;
+  font-size: 11px;
+  font-weight: 800;
+  text-anchor: middle;
+  dominant-baseline: central;
+  transition: fill .1s ease;
+}
+
+.rhythm__count--strong { fill: var(--rhythm-on); font-size: 12.5px; font-weight: 900; }
+.rhythm__count--held { fill: #b9b3c8; }
+.rhythm__count--and { font-size: 10px; fill: #7a7183; }
+.rhythm__count--and.rhythm__count--held { fill: #b9b3c8; }
+
+.rhythm__brace { fill: none; stroke: #9a8f7d; stroke-width: 1.3; stroke-linejoin: round; }
+.rhythm__number-dot { fill: var(--rhythm-on); }
+
+.rhythm__number {
+  fill: #fff;
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* playing: the note that sounds and the count it is on light up */
+.rhythm__note.is-on .rhythm__head,
+.rhythm__note.is-on .rhythm__flag { fill: var(--rhythm-on); }
+.rhythm__note.is-on .rhythm__stem { stroke: var(--rhythm-on); }
+.rhythm__note.is-on .rhythm__cell,
+.rhythm__cell.is-on { fill: var(--rhythm-on); }
+.rhythm__count.is-on { fill: #F57C00; font-size: 14px; }
+
+/* the paper a rhythm lies on; as a button it plays on tap */
+.rhythm-paper {
+  display: block;
+  width: 100%;
+  max-width: 640px;
+  margin: 0 auto;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 18px;
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  font-family: inherit;
+  color: var(--ink);
+}
+
+button.rhythm-paper { cursor: pointer; transition: transform .12s ease; }
+button.rhythm-paper:active { transform: scale(.98); }
+
+/* a long line keeps its notes readable and scrolls sideways on a phone */
+.rhythm-paper--scroll { overflow-x: auto; }
+.rhythm-paper--scroll .rhythm { min-width: 480px; }
+
+.rhythm-paper--prompt { max-width: 560px; }
+.rhythm-paper--glyph { width: min(200px, 56vw); padding: 10px 14px 12px; }
+
+.prompt--wide { width: 100%; }
+
+.listen {
+  padding: 10px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--accent);
+  color: #fff;
+  font-family: inherit;
+  font-size: 15px;
+  font-weight: 800;
+  cursor: pointer;
+  box-shadow: var(--shadow);
+}
+
+.listen:active { transform: scale(.96); }
+
+.caption--top { margin: 0 0 12px; }
+
+/* a fact in a frame: a term and what it means */
+.fact {
+  margin: 14px 0 0;
+  padding: 14px 16px;
+  border-left: 5px solid var(--accent);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .07);
+}
+
+.fact__title { font-size: 18px; font-weight: 900; }
+.fact__text { margin-top: 4px; font-size: 15px; line-height: 1.5; color: rgba(255, 255, 255, .82); }
+
+/* ---------- Duration tree ---------- */
+
+.tree { display: grid; gap: 0; max-width: 560px; margin: 0 auto; }
+.tree__level { display: grid; justify-items: center; }
+
+.tree__arrow {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  margin: 6px 0;
+  border-radius: 50%;
+  background: var(--accent);
+  font-size: 17px;
+  font-weight: 900;
+}
+
+.tree__card {
+  display: grid;
+  gap: 4px;
+  width: 100%;
+  padding: 10px 14px 12px;
+  border: 0;
+  border-radius: 18px;
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  font-family: inherit;
+  color: var(--ink);
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+
+.tree__card:active { transform: scale(.98); }
+
+.tree__title {
+  justify-self: center;
+  padding: 3px 14px;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--accent) 22%, white);
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.tree__note { font-size: 13px; color: var(--muted); }
+
+.duration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 12px;
+}
+
+.duration-card {
+  display: grid;
+  align-content: start;
+  justify-items: center;
+  gap: 4px;
+  padding: 12px 12px 14px;
+  border: 0;
+  border-radius: var(--radius);
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  font-family: inherit;
+  color: var(--ink);
+  text-align: center;
+  cursor: pointer;
+  transition: transform .12s ease;
+}
+
+.duration-card:active { transform: scale(.97); }
+.duration-card__glyph { width: 110px; }
+.duration-card__name { font-size: 18px; font-weight: 900; }
+.duration-card__looks { font-size: 13px; line-height: 1.35; color: var(--muted); }
+.duration-card__lasts { font-size: 13px; line-height: 1.35; font-weight: 700; color: #2e7d32; }
+
+/* ---------- Bars ---------- */
+
+.puzzle { display: grid; gap: 12px; }
+.puzzle__question { text-align: center; font-size: 22px; font-weight: 900; }
+
+.puzzle__answer {
+  justify-self: center;
+  padding: 10px 16px;
+  border-radius: 16px;
+  background: rgba(129, 199, 132, .2);
+  border: 2px solid #81c784;
+  text-align: center;
+  font-size: 16px;
+  font-weight: 800;
+  animation: pop .35s ease;
+}
+
+/* ---------- Time signatures ---------- */
+
+.meter-card {
+  padding: 14px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, .07);
+  border: 1px solid rgba(255, 255, 255, .1);
+}
+
+.meter-card__title { margin-bottom: 10px; text-align: center; font-size: 22px; font-weight: 900; }
+.meter-card__text { margin-top: 10px; text-align: center; font-size: 16px; color: rgba(255, 255, 255, .85); }
+.meter-card__text b { color: #ffe082; }
+.meter-card .row--center { margin-top: 14px; }
+
+.claps { display: flex; justify-content: center; gap: 10px; margin-top: 12px; }
+
+.clap {
+  display: grid;
+  justify-items: center;
+  min-width: 58px;
+  padding: 6px 8px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .08);
+  transition: transform .1s ease, background .1s ease;
+}
+
+.clap__hands { font-size: 26px; line-height: 1.2; }
+.clap__word { font-size: 15px; font-weight: 800; color: rgba(255, 255, 255, .75); }
+.clap--strong .clap__word { font-size: 19px; font-weight: 900; color: #fff; }
+.clap.is-on { background: var(--accent); transform: scale(1.12); }
+.clap.is-on .clap__word { color: #fff; }
+
+.walk {
+  display: grid;
+  gap: 2px;
+  max-width: 560px;
+  margin: 0 auto;
+  padding: 12px 14px 10px;
+  border-radius: 18px;
+  background: #fbf3df;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.walk__title { text-align: center; font-family: Georgia, "Times New Roman", serif; font-size: 20px; font-weight: 700; }
+
+/* ---------- Rhythm games ---------- */
+
+.options--rhythm { grid-template-columns: repeat(2, 1fr); }
+.options--numbers { grid-template-columns: repeat(4, 1fr); }
+.options--meters { grid-template-columns: repeat(3, 1fr); }
+.options--rhythm .option { min-height: 84px; }
+.option .rhythm { --rhythm-ink: #fff; }
+.option__name--long { font-size: 21px; }
+.option__glyph { width: 64px; }
+
+/* the time signature as it stands on the staff: one digit above the other */
+.meter-mark {
+  display: grid;
+  justify-items: center;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
+  font-weight: 900;
+  line-height: .95;
+}
+
+/* "one long note = ? short ones" on a strip of paper */
+.equation {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: min(420px, 100%);
+  padding: 10px 12px;
+  border-radius: 18px;
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+}
+
+.equation__sign { font-size: 30px; font-weight: 900; }
+.equation__ask { font-size: 38px; font-weight: 900; color: #E65100; }
+.equation__group { display: flex; flex-wrap: wrap; justify-content: center; max-width: 260px; }
+.equation__group .tree-glyph { width: 54px; }
+.equation__group--many .tree-glyph { width: 46px; margin: 0 -6px; }
+.tree-glyph { flex: none; width: 88px; }
+
+@media (min-width: 620px) {
+  .options--rhythm:not(.options--numbers):not(.options--meters) { grid-template-columns: repeat(4, 1fr); }
 }

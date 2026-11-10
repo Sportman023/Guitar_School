@@ -16,9 +16,9 @@
 import { svgEl } from "./ui.js";
 import { octaveName, octaveShort } from "../data/notes.js";
 
-const TOP_LINE = 24;
-const SPACING = 10;
-const BOTTOM_LINE = TOP_LINE + SPACING * 4; // 64 — first line, note E
+export const TOP_LINE = 24;
+export const SPACING = 10;
+export const BOTTOM_LINE = TOP_LINE + SPACING * 4; // 64 — first line, note E
 const G_LINE = TOP_LINE + SPACING * 3; // 54 — second line, note G
 const MIDDLE_STEP = 4; // middle line, note B
 const MIDDLE_Y = TOP_LINE + SPACING * 2; // 44 — the same line in coordinates
@@ -28,8 +28,8 @@ const NOTE_X = 88;
 // the narrow picture (see renderStaff): the note right after the clef, and
 // staff lines running on past the edges until a frame around it cuts them
 const NARROW = { width: 100, noteX: 68, bleed: 60 };
-const HEAD_RX = 6.3;
-const HEAD_RY = 4.7;
+export const HEAD_RX = 6.3;
+export const HEAD_RY = 4.7;
 
 const ROW_FIRST_X = 64;
 const ROW_STEP = 25;
@@ -48,8 +48,8 @@ const CLEF_LEFT = 10;
 const CLEF_TRANSFORM = `translate(${CLEF_LEFT} ${G_LINE - CLEF_EYE_Y * CLEF_SCALE}) scale(${CLEF_SCALE})`;
 // how far the clef reaches up and down, and the room a note head needs around
 // its centre — for pictures with no room to spare (see tightStaffBox)
-const CLEF_TOP = G_LINE - CLEF_EYE_Y * CLEF_SCALE;
-const CLEF_BOTTOM = CLEF_TOP + 40.768 * CLEF_SCALE;
+export const CLEF_TOP = G_LINE - CLEF_EYE_Y * CLEF_SCALE;
+export const CLEF_BOTTOM = CLEF_TOP + 40.768 * CLEF_SCALE;
 const HEAD_ROOM = 6;
 
 export function noteY(note) {
@@ -88,7 +88,7 @@ export function tightStaffBox(notes) {
 }
 
 /** Five staff lines from x1 to x2 plus the treble clef. */
-function staffBase(x1, x2) {
+export function staffBase(x1, x2) {
   const parts = [];
   for (let i = 0; i < 5; i++) {
     const y = TOP_LINE + i * SPACING;

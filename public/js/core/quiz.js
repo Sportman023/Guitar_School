@@ -105,6 +105,8 @@ export function createQuiz(config) {
     // (note, notes, pick), where pick(id) answers with that id
     renderBoard = null,
     onAsk = null,
+    // called when the child leaves the game, e.g. to stop a rhythm playing
+    onLeave = null,
     // controls above the question; gets { redraw, restart }
     renderControls = null,
     // which notes to ask about: the first octave by default. A function is
@@ -112,6 +114,9 @@ export function createQuiz(config) {
     notes = NOTES,
     // wrong answer options; random notes from the same set by default
     pickOthers = (note, pool, count) => sample(pool, count, [note]),
+    // a compare function that puts the options in a fixed order (numbers
+    // going up, 2/4 before 3/4); shuffled when not given
+    sortOptions = null,
     // what to say after a wrong answer
     explainAnswer = (note) => `Это ${note.ru} — ${note.colorName.toLowerCase()}`,
   } = config;
@@ -159,7 +164,10 @@ export function createQuiz(config) {
 
         const note = queue[index];
         const fresh = !options;
-        if (fresh) options = renderBoard ? [] : shuffle([note, ...pickOthers(note, pool, optionsCount - 1)]);
+        if (fresh) {
+          options = renderBoard ? [] : shuffle([note, ...pickOthers(note, pool, optionsCount - 1)]);
+          if (sortOptions) options.sort(sortOptions);
+        }
         const feedback = el('div', { class: 'feedback' }, ' ');
 
         let answers;
@@ -245,7 +253,10 @@ export function createQuiz(config) {
       }
 
       renderQuestion();
-      return () => { cancelled = true; };
+      return () => {
+        cancelled = true;
+        if (onLeave) onLeave();
+      };
     },
   };
 }

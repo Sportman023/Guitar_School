@@ -8,7 +8,10 @@
 // shows a tag instead of a score. A section added to an existing topic gets
 // "Новое!" on the topic tile and on its own card until the topic is opened.
 // A topic with inOrder: true opens its games one by one, in the order of
-// MODULES (see js/core/locks.js).
+// MODULES (see js/core/locks.js). A topic with `rows` groups its sections:
+// each row is a list of section ids and starts on a new line of the menu,
+// leaving the rest of the line before empty; sections not named in any row
+// go to a last row of their own.
 
 import learn from './learn.js';
 import rainbow from './rainbow.js';
@@ -23,6 +26,10 @@ import treeToys from './tree-toys.js';
 import pumpkins from './pumpkins.js';
 import berries from './berries.js';
 import detective from './detective.js';
+import durations from './durations.js';
+import bars from './bars.js';
+import meters from './meters.js';
+import { durationName, durationTree, countBars, guessMeter } from './rhythm-games.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -63,6 +70,19 @@ export const GROUPS = [
     emoji: '🎶',
     accent: '#FB8C00',
     inOrder: true,
+  },
+  {
+    id: 'rhythm',
+    title: 'Ритм',
+    subtitle: 'Длительности, такт и размер',
+    emoji: '🥁',
+    accent: '#43A047',
+    // each lesson on a row of its own, followed by its games
+    rows: [
+      ['durations', 'duration-name', 'duration-tree'],
+      ['bars', 'count-bars'],
+      ['meters', 'guess-meter'],
+    ],
   },
 ];
 
@@ -214,4 +234,12 @@ export const MODULES = [
   pumpkins,
   berries,
   detective,
+
+  durations,
+  durationName,
+  durationTree,
+  bars,
+  countBars,
+  meters,
+  guessMeter,
 ];

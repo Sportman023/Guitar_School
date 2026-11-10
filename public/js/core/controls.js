@@ -4,25 +4,58 @@ import { OCTAVES } from '../data/notes.js';
 import { HANDS, FINGERS } from '../data/fingers.js';
 
 /**
+ * A switch for a hint that is scaffolding: on while the topic is new, off once
+ * the child manages without it. The choice is kept per player under `setting`.
+ */
+function hintToggle({ setting, on, off, extraClass = '', onChange }) {
+  const isOn = store.setting(setting, true);
+  return el('div', { class: 'toggle-row' },
+    el('button', {
+      class: `toggle ${extraClass} ${isOn ? 'toggle--on' : ''}`.trim(),
+      type: 'button',
+      'aria-pressed': isOn ? 'true' : 'false',
+      onclick: () => {
+        store.setSetting(setting, !isOn);
+        onChange();
+      },
+    },
+      el('span', { class: 'toggle__dot' }),
+      el('span', null, isOn ? on : off),
+    ));
+}
+
+/**
  * The "coloured notes" toggle shared by the staff sections.
  * Colour is scaffolding: first lean on the rainbow colours the child already
  * knows, then switch it off and read plain black notes.
  */
 export function colorToggle(onChange) {
-  const colored = store.setting('coloredHeads', true);
-  return el('div', { class: 'toggle-row' },
-    el('button', {
-      class: `toggle ${colored ? 'toggle--on' : ''}`,
-      type: 'button',
-      onclick: () => {
-        store.setSetting('coloredHeads', !colored);
-        onChange();
-      },
-    },
-      el('span', { class: 'toggle__dot' }),
-      el('span', null, colored ? 'Цветные нотки' : 'Чёрные нотки, как в настоящих нотах'),
-    ));
+  return hintToggle({
+    setting: 'coloredHeads',
+    on: 'Цветные нотки',
+    off: 'Чёрные нотки, как в настоящих нотах',
+    extraClass: 'toggle--rainbow',
+    onChange,
+  });
 }
+
+/**
+ * The "count under the notes" toggle shared by the rhythm games: the count
+ * "1 и 2 и…" under the staff and how long each note lasts. Off, the child counts
+ * by themselves.
+ */
+export function countToggle(onChange) {
+  return hintToggle({
+    setting: 'rhythmCounts',
+    on: 'Счёт под нотами',
+    off: 'Без подсказки — считаю сам',
+    extraClass: 'toggle--count',
+    onChange,
+  });
+}
+
+/** Whether the rhythm games show the count under the notes. */
+export const showsCount = () => store.setting('rhythmCounts', true);
 
 /** What the player picked under `setting` out of `all`; everything until they pick. */
 function picked(setting, all) {
