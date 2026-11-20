@@ -6,6 +6,8 @@
 //   'q'  — quarter note     1 quarter
 //   'e'  — eighth note      half a quarter, with its own flag
 //   'ee' — two eighths joined by a beam, one quarter together
+//   'ssss' — four sixteenths joined by two beams, one quarter together
+//          ('s' is one of them; so far sixteenths only come in fours)
 // A bare number in place of a bar is an empty bar that many quarters wide
 // (a staff with bar lines only). Lengths are counted in quarters, which are
 // also the beats of 2/4, 3/4 and 4/4 — the only time signatures taught so far.
@@ -13,7 +15,7 @@
 // Russian needs several forms of every name: "целая нота", "2 половинные",
 // "8 восьмых", "в одной четвертной".
 
-export const TOKEN_LENGTH = { w: 4, h: 2, q: 1, e: 0.5, ee: 1 };
+export const TOKEN_LENGTH = { w: 4, h: 2, q: 1, e: 0.5, ee: 1, s: 0.25, ssss: 1 };
 
 export const DURATIONS = [
   {
@@ -74,6 +76,9 @@ export function countOf(count, duration) {
   return `${count} ${count < 5 ? duration.few : duration.many}`;
 }
 
+/** The word for beats after a number: "1 доля", "3 доли", "5 долей". */
+export const beatsWord = (count) => (count === 1 ? 'доля' : count < 5 ? 'доли' : 'долей');
+
 // The duration tree: each level splits the one above it in two.
 // `note` is said beside the level, as on the card from school.
 export const TREE = [
@@ -95,6 +100,15 @@ export const METER_BY_BEATS = Object.fromEntries(METERS.map((meter) => [meter.be
 export const barLength = (bar) => (typeof bar === 'number'
   ? bar
   : bar.reduce((sum, token) => sum + TOKEN_LENGTH[token], 0));
+
+// Rhythm syllables, said while a rhythm is clapped, as on the cards from
+// school: ТА for a quarter, ТИ for an eighth, so two beamed eighths are ТИ-ТИ,
+// and four sixteenths are ТУ-ТИ-ФРУ-ТИ. Only the notes taught with syllables
+// so far have one.
+export const SYLLABLES = { q: 'ТА', e: 'ТИ', ee: 'ТИ-ТИ', ssss: 'ТУ-ТИ-ФРУ-ТИ' };
+
+/** What a bar says, one word per piece: ['ТА', 'ТИ-ТИ', 'ТА', 'ТА']. */
+export const syllablesOf = (bar) => bar.map((token) => SYLLABLES[token]);
 
 // "Весёлая прогулка" from the card about where time signatures are met:
 // three lines of two bars in 3/4.

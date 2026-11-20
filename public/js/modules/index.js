@@ -30,6 +30,11 @@ import durations from './durations.js';
 import bars from './bars.js';
 import meters from './meters.js';
 import { durationName, durationTree, countBars, guessMeter } from './rhythm-games.js';
+import sweetBeats from './sweet-beats.js';
+import leafSums from './leaf-sums.js';
+import taTi from './ta-ti.js';
+import mushrooms from './mushrooms.js';
+import barlines from './barlines.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -83,6 +88,15 @@ export const GROUPS = [
       ['bars', 'count-bars'],
       ['meters', 'guess-meter'],
     ],
+  },
+  {
+    // games after the rhythm worksheets from school, from the easiest one
+    id: 'rhythm-play',
+    title: 'Игры по ритму',
+    subtitle: 'Считаем доли, читаем и делим ритм',
+    emoji: '👏',
+    accent: '#EC407A',
+    inOrder: true,
   },
 ];
 
@@ -242,4 +256,10 @@ export const MODULES = [
   countBars,
   meters,
   guessMeter,
+
+  sweetBeats,
+  leafSums,
+  taTi,
+  mushrooms,
+  barlines,
 ];

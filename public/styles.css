@@ -2564,3 +2564,604 @@ button.rhythm-paper:active { transform: scale(.98); }
 @media (min-width: 620px) {
   .options--rhythm:not(.options--numbers):not(.options--meters) { grid-template-columns: repeat(4, 1fr); }
 }
+
+/* ---------- Rhythm pictures for the rhythm worksheets ---------- */
+
+/* The colours of the rhythm syllables, the same on the cards of "ТА и ТИ-ТИ"
+   and under the notes: ТА, ТИ-ТИ and ТУ-ТИ-ФРУ-ТИ each a colour of its own,
+   so the words of a bar never run together. */
+.syllable--q { --syllable: #BBDEFB; --syllable-ink: #0D47A1; }
+.syllable--ee { --syllable: #FFE082; --syllable-ink: #7A3E00; }
+.syllable--ssss { --syllable: #F8BBD0; --syllable-ink: #880E4F; }
+
+/* a module of a syllable under the notes, as long as its beat; it lights up
+   while its beat sounds */
+.rhythm__module rect {
+  fill: var(--syllable);
+  stroke: color-mix(in srgb, var(--syllable-ink) 35%, transparent);
+  stroke-width: 1;
+  transition: fill .1s ease;
+}
+
+.rhythm__word {
+  fill: var(--syllable-ink);
+  font-family: inherit;
+  font-size: 9.5px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+  transition: fill .1s ease;
+}
+
+.rhythm__module.is-on rect { fill: var(--syllable-ink); }
+.rhythm__module.is-on .rhythm__word { fill: #fff; }
+
+/* a dot under every beat; a beat a long note holds through is grey */
+.rhythm__pulse {
+  fill: #4a4466;
+  transform-box: fill-box;
+  transform-origin: center;
+  transition: fill .1s ease, transform .1s ease;
+}
+
+.rhythm__pulse--held { fill: #cbc5d8; }
+.rhythm__pulse.is-on { fill: #F57C00; transform: scale(1.5); }
+
+/* the gaps a bar line can go into; a wrong one flashes red */
+.rhythm__gap { cursor: pointer; }
+.rhythm__gap-hit { fill: transparent; }
+.rhythm__gap-line { stroke: #a79fc2; stroke-width: 1.6; stroke-dasharray: 3 3; transition: stroke .15s ease; }
+.rhythm__gap:hover .rhythm__gap-line { stroke: var(--rhythm-on); stroke-width: 2.2; }
+.rhythm__gap.is-wrong .rhythm__gap-line { animation: gap-wrong .9s ease; }
+
+@keyframes gap-wrong {
+  0%, 55% { stroke: #e53935; stroke-width: 3.2; stroke-dasharray: none; }
+}
+
+/* a bar line that has just been found grows from the middle of the staff */
+.rhythm__bar--new {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: bar-in .5s cubic-bezier(.3, 1.6, .5, 1);
+}
+
+@keyframes bar-in {
+  0% { transform: scaleY(0); stroke: #F57C00; stroke-width: 3; }
+  60% { stroke: #F57C00; stroke-width: 3; }
+}
+
+/* the signs of a sum of durations */
+.rhythm__sign {
+  fill: var(--rhythm-ink);
+  font-family: inherit;
+  font-size: 17px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* ---------- Sweet beats ---------- */
+
+.beats__task {
+  margin: 0 0 14px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .8);
+}
+
+.beats__stage { display: grid; justify-items: center; gap: 16px; }
+.beats__note { width: min(180px, 48vw); padding: 14px 22px; }
+
+.treats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  width: min(460px, 100%);
+}
+
+.treat {
+  display: grid;
+  justify-items: center;
+  gap: 2px;
+  padding: 10px 4px 4px;
+  border: 0;
+  border-radius: 18px;
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  color: var(--ink);
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .12s ease, background .15s ease;
+}
+
+.treat:active { transform: scale(.95); }
+/* a coloured treat hopping to the front of the row goes over the others */
+.treat.is-hopping { position: relative; z-index: 2; }
+
+.treat__art {
+  display: block;
+  width: 100%;
+  max-width: 92px;
+  height: auto;
+  overflow: visible;
+}
+
+/* a page of a colouring book: cream with dark outlines until it is coloured */
+.treat__paint,
+.treat__paint2,
+.treat__cherry,
+.treat__stick { fill: #fffdf5; stroke: #2b2448; stroke-width: 2.2; stroke-linejoin: round; transition: fill .3s ease; }
+.treat__line { fill: none; stroke: #2b2448; stroke-width: 1.4; stroke-linecap: round; }
+.treat__stem { fill: none; stroke: #2b2448; stroke-width: 3; stroke-linecap: round; }
+.treat__shine { fill: none; stroke: #fff; stroke-width: 3; stroke-linecap: round; opacity: 0; transition: opacity .3s ease; }
+
+.treat.is-painted .treat__paint { fill: var(--paint); }
+.treat.is-painted .treat__paint2 { fill: var(--paint2); }
+.treat.is-painted .treat__cherry { fill: #E53935; }
+.treat.is-painted .treat__stick { fill: #E8C48A; }
+.treat.is-painted .treat__shine { opacity: .6; }
+.treat.is-painted .treat__art { animation: treat-in .3s ease; }
+
+@keyframes treat-in {
+  50% { transform: scale(1.12) rotate(-4deg); }
+}
+
+/* the count of the beats, under the treats that sound once the answer is given */
+.treat__count { min-height: 20px; font-size: 14px; font-weight: 900; color: #C2185B; opacity: 0; transition: opacity .15s ease; }
+.beats__stage.is-counted .treat[data-lit] .treat__count { opacity: .45; }
+.treat.is-on { background: color-mix(in srgb, var(--accent) 22%, white); box-shadow: 0 0 0 4px var(--accent), var(--shadow); transform: scale(1.08); }
+.beats__stage.is-counted .treat.is-on .treat__count { opacity: 1; }
+
+.beats__done { min-width: 170px; font-size: 18px; }
+
+/* ---------- Count and colour ---------- */
+
+.sums__task {
+  margin: 0 0 8px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .8);
+}
+
+/* the paints stay just under the top bar while the leaves are scrolled;
+   --bar is the bar's height, set by the game */
+.sum-paints {
+  position: sticky;
+  top: var(--bar, 63px);
+  z-index: 5;
+  margin: 0 -16px;
+  padding: 8px 16px 0;
+  background: rgba(22, 16, 54, .92);
+  backdrop-filter: blur(12px);
+}
+
+.sum-paints .feedback { min-height: 26px; margin: 4px 0 0; font-size: 16px; }
+
+.sum-paints__row {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+.sum-paint {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  gap: 5px;
+  padding: 6px 0;
+  border: 0;
+  border-radius: 16px;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* a blob of paint, a little uneven, as if just squeezed out of the tube */
+.sum-paint__pot {
+  width: 46px;
+  height: 38px;
+  border-radius: 48% 52% 44% 56% / 58% 46% 54% 42%;
+  background: var(--paint);
+  box-shadow: inset -4px -5px 0 rgba(0, 0, 0, .16), 0 3px 6px rgba(0, 0, 0, .35);
+  transition: transform .15s ease;
+}
+
+.sum-paint__note { width: 54px; padding: 2px 4px; border-radius: 10px; background: #fffdf5; }
+.sum-paint:active .sum-paint__pot { transform: scale(.9); }
+
+/* the paint on the brush */
+.sum-paint.is-selected { background: rgba(255, 255, 255, .14); box-shadow: inset 0 0 0 3px #ffd54f; }
+.sum-paint.is-selected .sum-paint__pot { transform: scale(1.12) rotate(-8deg); }
+.sum-paint.is-selected::after {
+  content: '🖌️';
+  position: absolute;
+  top: -4px;
+  right: 0;
+  font-size: 18px;
+  pointer-events: none;
+}
+
+/* leaves lie in rows of two on a phone, more on a wider screen, every other
+   pair a little lower, as if they had just fallen */
+.sum-leaves {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 10px;
+  margin-top: 12px;
+}
+
+.sum-leaf {
+  position: relative;
+  display: block;
+  width: min(180px, calc(50% - 5px));
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+}
+
+.sum-leaf:nth-child(4n + 2),
+.sum-leaf:nth-child(4n + 3) { margin-top: 16px; }
+
+.sum-leaf__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 6px 8px rgba(10, 5, 35, .35));
+  transition: transform .15s ease, filter .2s ease;
+}
+
+.sum-leaf__blade { fill: #fffdf5; stroke: #2b2448; stroke-width: 1.6; stroke-linejoin: round; transition: fill .5s ease, stroke .15s ease; }
+.sum-leaf__stem { fill: none; stroke: #2b2448; stroke-width: 2.4; stroke-linecap: round; }
+
+/* the sum lies across the middle of the leaf, upright whatever the tilt */
+.sum-leaf__sum {
+  position: absolute;
+  left: 50%;
+  top: 49%;
+  width: 60%;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.sum-leaf:active .sum-leaf__art { transform: scale(.96); }
+.sum-leaf.is-selected .sum-leaf__blade { stroke: #ffd54f; stroke-width: 3.5; }
+.sum-leaf.is-selected .sum-leaf__art { filter: drop-shadow(0 0 14px rgba(255, 213, 79, .85)); }
+.sum-leaf.is-shaking { animation: shake .4s ease; }
+
+.sum-leaf.is-painted { animation: flutter 1s ease-out; }
+.sum-leaf.is-painted .sum-leaf__blade { fill: var(--paint); }
+/* on a painted leaf the sum takes the colour that reads on that paint */
+.sum-leaf.is-painted .rhythm { --rhythm-ink: var(--paint-ink); }
+
+/* the strips of a sum are counted, so they are drawn bolder than elsewhere */
+.rhythm--sum .rhythm__cell { fill: color-mix(in srgb, var(--rhythm-on) 60%, transparent); }
+.sum-leaf.is-painted .rhythm--sum .rhythm__cell { fill: color-mix(in srgb, var(--paint-ink) 55%, transparent); }
+
+/* every leaf is painted: they all glow */
+.sum-leaves--done .sum-leaf__art { animation: lit 1s ease-in-out infinite alternate; }
+
+@keyframes flutter {
+  25% { transform: rotate(-7deg) translateY(-6px); }
+  55% { transform: rotate(5deg); }
+  80% { transform: rotate(-2deg); }
+}
+
+/* ---------- ТА и ТИ-ТИ ---------- */
+
+/* the board takes the screen below the controls, so they are packed tighter
+   (here and in "Pick the mushrooms") */
+.tati-game .progress,
+.shrooms-game .progress { margin-bottom: 10px; }
+.tati-game .toggle-row,
+.shrooms-game .toggle-row { margin-bottom: 8px; }
+.tati-game .feedback,
+.shrooms-game .feedback { min-height: 24px; margin: 4px 0 6px; font-size: 16px; line-height: 24px; }
+
+/* on a phone "Нет, здесь ТИ-ТИ ТА ТА ТА. Найди эту карточку" takes two lines;
+   the room for them is kept, so the board doesn't jump down when it's said */
+@media (max-width: 520px) {
+  .tati-game .feedback { display: grid; align-content: center; min-height: 50px; }
+}
+
+.tati__task,
+.glade__task {
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, .8);
+}
+
+/* bars on the left, cards on the right, and room between them for a line;
+   the cards take as much room as their modules need, the bars the rest, and
+   the sizes of the bars are set by the game to fit the screen */
+.tati {
+  position: relative;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0 20px;
+  max-width: 760px;
+  margin: 0 auto;
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* the gap is the game's GAP */
+.tati__col { display: flex; flex-direction: column; justify-content: space-around; gap: 8px; }
+.tati__col--bars { align-items: flex-end; }
+
+.tati__lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.tati__line {
+  fill: none;
+  stroke: #ffd54f;
+  stroke-width: 4;
+  stroke-linecap: round;
+  filter: drop-shadow(0 2px 2px rgba(10, 5, 35, .5));
+}
+
+.tati__line--wrong { stroke: #ff8a80; }
+
+/* padding and border are the game's PAPER_X and PAPER_Y */
+.tati-bar {
+  display: block;
+  width: var(--bar-w, 100%);
+  height: var(--bar-h, auto);
+  padding: 2px 6px;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  background: #fffdf5;
+  box-shadow: var(--shadow);
+  font-family: inherit;
+  cursor: pointer;
+  /* a finger on a bar or a card draws a line instead of scrolling the page */
+  touch-action: none;
+  transition: transform .12s ease, border-color .15s ease, box-shadow .15s ease;
+}
+
+.tati-bar .rhythm { width: 100%; height: 100%; }
+.tati-bar:active { transform: scale(.97); }
+
+/* what was tapped first, or where a line starts, has to be seen from across the room */
+.tati-bar.is-selected { border-color: #ffd54f; box-shadow: 0 0 0 4px #ffd54f, 0 0 24px 6px rgba(255, 213, 79, .5), var(--shadow); }
+.tati-bar.is-over { border-color: #9CCC65; box-shadow: 0 0 0 4px #9CCC65, var(--shadow); }
+.tati-bar.is-done { border-color: #81c784; }
+.tati-bar.is-new { animation: pop .35s ease; }
+
+/* A card of the sheet: a module for every beat. On a phone the halves of the
+   bar stand one over the other, so the cards stay narrow and the bars big;
+   on a wide screen the whole bar is one row. */
+.tati-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  min-height: 44px;
+  padding: 5px 6px;
+  border: 2px solid rgba(255, 255, 255, .3);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, .1);
+  font-family: inherit;
+  cursor: pointer;
+  touch-action: none;
+  box-shadow: 0 6px 12px rgba(10, 5, 35, .3);
+  transition: transform .12s ease, box-shadow .15s ease, opacity .2s ease;
+}
+
+.tati-card__half { display: flex; align-items: center; gap: 4px; }
+
+.tati-module {
+  display: grid;
+  justify-items: center;
+  padding: 2px 5px;
+  border: 1.5px solid color-mix(in srgb, var(--syllable-ink) 40%, transparent);
+  border-radius: 8px;
+  background: var(--syllable);
+  color: var(--syllable-ink);
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1.15;
+  white-space: nowrap;
+}
+.tati-card:active { transform: scale(.96); }
+.tati-card.is-selected { box-shadow: 0 0 0 4px #ffd54f, 0 0 24px 6px rgba(255, 213, 79, .5); transform: scale(1.04); }
+.tati-card.is-over { box-shadow: 0 0 0 4px #9CCC65; transform: scale(1.06); }
+.tati-card.is-shaking { animation: shake .4s ease; }
+.tati-card.is-flying { position: relative; z-index: 2; }
+.tati-card.is-gone { visibility: hidden; }
+.tati-card--extra { opacity: .45; filter: grayscale(.6); }
+
+/* every bar has its syllables: they all hop */
+.tati--done .tati-bar { animation: bounce .6s ease-in-out 2; }
+
+@media (min-width: 620px) {
+  /* the cards get a column as wide as the bars, and a bar that doesn't fit
+     on one line breaks in its middle */
+  .tati { grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); }
+  .tati-card { flex-direction: row; flex-wrap: wrap; gap: 5px; padding: 6px 8px; }
+  .tati-card__half { gap: 5px; }
+  .tati-module { display: block; padding: 3px 8px; font-size: 16px; }
+  .tati-module__line { display: inline; }
+}
+
+/* ---------- Pick the mushrooms ---------- */
+
+.glade {
+  -webkit-user-select: none;
+  user-select: none;
+  -webkit-touch-callout: none;
+}
+
+/* rows of --cols mushrooms, the last one centred; the sizes are set by the
+   game to fit the screen, the gap is the game's GAP */
+.glade__mushrooms {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 6px;
+  max-width: calc(var(--cols, 2) * var(--mushroom, 140px) + (var(--cols, 2) - 1) * 6px);
+  margin: 0 auto;
+}
+
+.shroom {
+  position: relative;
+  display: block;
+  width: var(--mushroom, 140px);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: grab;
+  /* a finger on a mushroom carries it instead of scrolling the page */
+  touch-action: none;
+}
+
+.shroom__body {
+  position: relative;
+  display: block;
+  filter: drop-shadow(0 6px 8px rgba(10, 5, 35, .35));
+  transition: transform .15s ease, filter .15s ease;
+}
+
+.shroom__art { display: block; width: 100%; height: auto; overflow: visible; }
+.shroom__cap { fill: #EBCFA8; stroke: #9C6B3F; stroke-width: 2; stroke-linejoin: round; }
+.shroom__gills { fill: #C9A27A; }
+.shroom__stem { fill: #FBF4E6; stroke: #B8A389; stroke-width: 2; stroke-linejoin: round; }
+.shroom__shine { fill: none; stroke: #FFF7EA; stroke-width: 4; stroke-linecap: round; opacity: .75; }
+
+/* the notes on the cap, x 20…120 and y 14…58 of the 140 × 104 mushroom */
+.shroom__face {
+  position: absolute;
+  left: 14.3%;
+  top: 13.5%;
+  width: 71.4%;
+  height: 42.3%;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+
+.shroom__face .rhythm { max-height: 100%; }
+
+/* the count on a small cap is set a little bigger than elsewhere */
+.shroom__face .rhythm__count { font-size: 13px; }
+.shroom__face .rhythm__count--and { font-size: 12px; }
+.shroom__face .rhythm__count--strong { font-size: 14px; }
+.shroom:active .shroom__body { transform: scale(.95); }
+.shroom.is-selected .shroom__body { transform: scale(1.06); filter: drop-shadow(0 0 12px rgba(255, 213, 79, .95)); }
+.shroom.is-carried,
+.shroom.is-flying { z-index: 3; cursor: grabbing; }
+.shroom.is-carried .shroom__body { transform: scale(1.1); filter: drop-shadow(0 14px 14px rgba(10, 5, 35, .5)); }
+.shroom.is-picked { visibility: hidden; }
+.shroom.is-new { animation: pop .35s ease; }
+.shroom.is-shaking .shroom__body { animation: shake .4s ease; }
+
+.glade__baskets { display: flex; justify-content: center; gap: 6px; margin-top: 6px; }
+
+.shroom-basket {
+  position: relative;
+  display: block;
+  width: calc(var(--basket, 90px) * 4 / 3);
+  padding: 0;
+  border: 0;
+  background: none;
+  font-family: inherit;
+  cursor: pointer;
+  transition: transform .2s ease;
+}
+
+.shroom-basket__art {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 8px 10px rgba(10, 5, 35, .4));
+  transition: filter .2s ease;
+}
+
+.shroom-basket__handle { fill: none; stroke: #A1703A; stroke-width: 7; stroke-linecap: round; }
+.shroom-basket__wicker { fill: #C8955A; stroke: #8A5A2B; stroke-width: 2; stroke-linejoin: round; }
+.shroom-basket__weave { stroke: #9C6B35; stroke-width: 2; }
+.shroom-basket__rim { fill: #B07A40; stroke: #8A5A2B; stroke-width: 2; }
+.shroom-basket__plate { fill: #FFF8E7; stroke: #D7B98A; stroke-width: 1.5; }
+
+/* the time signature as it stands on the staff: one digit above the other */
+.shroom-basket__meter {
+  fill: #4E342E;
+  font-family: Georgia, "Times New Roman", serif;
+  font-size: 22px;
+  font-weight: 900;
+  text-anchor: middle;
+  dominant-baseline: central;
+}
+
+/* a mushroom in the basket pops up over the rim */
+.shroom-basket__mushroom {
+  opacity: 0;
+  transform: scale(0);
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  transition: transform .35s cubic-bezier(.3, 1.6, .5, 1), opacity .2s ease;
+}
+
+.shroom-basket__mushroom.is-in { opacity: 1; transform: scale(1); }
+
+/* the basket picked first, or the one a mushroom is carried over */
+.shroom-basket.is-selected,
+.shroom-basket.is-over { transform: scale(1.08); }
+.shroom-basket.is-selected .shroom-basket__art,
+.shroom-basket.is-over .shroom-basket__art { filter: drop-shadow(0 0 16px rgba(255, 213, 79, .9)); }
+.shroom-basket.is-full { animation: bounce .5s ease-in-out 2; }
+
+/* ---------- Bar lines ---------- */
+
+.barlines__task {
+  margin: 0 0 10px;
+  text-align: center;
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .8);
+}
+
+.barlines__case {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 4px 14px;
+  font-size: 15px;
+  font-weight: 800;
+}
+
+.barlines__left { color: #ffe082; }
+
+/* "Нет: в размере 3/4 …" takes two lines on a phone; the room is kept */
+.barlines-game .feedback { display: grid; align-content: center; min-height: 48px; margin: 6px 0; }
+
+/* a long line keeps its notes big and scrolls sideways */
+.barline-paper {
+  max-width: 860px;
+  overflow-x: auto;
+  padding: 8px 10px 6px;
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+.barlines__hint { margin-top: 8px; text-align: center; font-size: 13px; color: rgba(255, 255, 255, .6); }
