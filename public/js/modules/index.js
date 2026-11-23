@@ -259,7 +259,7 @@ export const MODULES = [
 
   sweetBeats,
   leafSums,
-  taTi,
   mushrooms,
+  taTi,
   barlines,
 ];
