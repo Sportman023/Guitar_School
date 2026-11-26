@@ -35,6 +35,9 @@ import leafSums from './leaf-sums.js';
 import taTi from './ta-ti.js';
 import mushrooms from './mushrooms.js';
 import barlines from './barlines.js';
+import { signsLearn, catTaxi, noteFriends } from './accidentals.js';
+import signsMatch from './signs-match.js';
+import catPoem from './cat-poem.js';
 import { colorToggle, octaveChips, drilledNotes } from '../core/controls.js';
 import { renderStaff, staffBox } from '../core/staff.js';
 import { store } from '../core/store.js';
@@ -97,6 +100,19 @@ export const GROUPS = [
     emoji: '👏',
     accent: '#EC407A',
     inOrder: true,
+  },
+  {
+    // sharps, flats and naturals: the lessons, each followed by its game; all open at once
+    id: 'accidentals',
+    title: 'Диез, бемоль, бекар',
+    subtitle: 'Знаки, которые меняют ноту',
+    emoji: '🎹',
+    accent: '#26A69A',
+    rows: [
+      ['signs-learn', 'signs-match'],
+      ['cat-taxi', 'cat-poem'],
+      ['note-friends'],
+    ],
   },
 ];
 
@@ -262,4 +278,10 @@ export const MODULES = [
   mushrooms,
   taTi,
   barlines,
+
+  signsLearn,
+  signsMatch,
+  catTaxi,
+  catPoem,
+  noteFriends,
 ];

@@ -57,6 +57,20 @@ export function countToggle(onChange) {
 /** Whether the rhythm games show the count under the notes. */
 export const showsCount = () => store.setting('rhythmCounts', true);
 
+/**
+ * The colour hint of the "sign and what it does" game: a sign, its name and
+ * what it does share a colour, so the first rounds can be matched by colour.
+ */
+export function signColorToggle(onChange) {
+  return hintToggle({
+    setting: 'signColors',
+    on: 'Цветные подсказки',
+    off: 'Без цвета — запоминаю сам',
+    extraClass: 'toggle--signs',
+    onChange,
+  });
+}
+
 /** What the player picked under `setting` out of `all`; everything until they pick. */
 function picked(setting, all) {
   const chosen = store.setting(setting, all).filter((value) => all.includes(value));
