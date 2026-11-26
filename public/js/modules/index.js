@@ -102,16 +102,15 @@ export const GROUPS = [
     inOrder: true,
   },
   {
-    // sharps, flats and naturals: the lessons, each followed by its game; all open at once
+    // sharps, flats and naturals: all the lessons first, then the games; all open at once
     id: 'accidentals',
     title: 'Диез, бемоль, бекар',
     subtitle: 'Знаки, которые меняют ноту',
     emoji: '🎹',
     accent: '#26A69A',
     rows: [
-      ['signs-learn', 'signs-match'],
-      ['cat-taxi', 'cat-poem'],
-      ['note-friends'],
+      ['signs-learn', 'cat-taxi', 'note-friends'],
+      ['signs-match', 'cat-poem'],
     ],
   },
 ];
@@ -280,8 +279,8 @@ export const MODULES = [
   barlines,
 
   signsLearn,
-  signsMatch,
   catTaxi,
-  catPoem,
   noteFriends,
+  signsMatch,
+  catPoem,
 ];
