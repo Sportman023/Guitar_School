@@ -10,6 +10,7 @@ import { renderGuitar } from './core/guitar.js';
 import { mountPlayers } from './screens/players.js';
 import workshop, { itemPreview, itemTitle } from './screens/workshop.js';
 import { IS_BETA } from './core/env.js';
+import { mountWinter, showWinter, winterGreeting } from './core/winter.js';
 
 // a "БЕТА" badge, so the test copy is never mistaken for the real one
 document.body.classList.toggle('is-beta', IS_BETA);
@@ -173,6 +174,7 @@ function renderHome() {
   const seen = seenSections();
   mount(appEl,
     el('p', { class: 'hello' }, `Привет, ${store.player.name}! Выбери, чем сегодня займёмся 🎸`),
+    winterGreeting(),
     renderGuitarCard(),
     renderRainbowStrip(),
     el('div', { class: 'topics' }, topics().map((topic) => renderTopicCard(topic, seen))),
@@ -336,6 +338,8 @@ function navigate() {
   currentRoute = render();
   // a menu comes back where the child left it; a section always starts at the top
   window.scrollTo(0, isMenuRoute(currentRoute) ? scrollMemory.get(currentRoute) || 0 : 0);
+  // the seasonal decorations stay out of the lessons and games
+  showWinter(isMenuRoute(currentRoute) || currentRoute === '#players');
 }
 
 function goHome() {
@@ -459,6 +463,7 @@ window.addEventListener('hashchange', navigate);
 // Browsers only allow sound after the first touch of the screen.
 document.addEventListener('pointerdown', () => ensureAudio(), { once: true });
 
+mountWinter();
 navigate();
 
 if ('serviceWorker' in navigator && location.protocol.startsWith('http')) {

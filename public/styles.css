@@ -3416,3 +3416,93 @@ button.poem-note:active { transform: scale(.94); }
 .neck-buttons .btn { display: grid; gap: 2px; justify-items: center; }
 .neck-buttons__pair { font-size: 16px; }
 .neck-buttons__where { font-size: 12px; font-weight: 700; opacity: .65; }
+
+/* ---------- Christmas (seasonal, js/core/winter.js) ---------- */
+/* Snow and the string of lights come out on the menus only (body.is-winter)
+   and are hidden in the lessons and games, so nothing moves beside the task. */
+
+.snow {
+  position: fixed;
+  inset: 0;
+  z-index: -1; /* behind the cards, in front of the background */
+  overflow: hidden;
+  pointer-events: none;
+  animation: fade .8s ease;
+}
+
+.snow i {
+  position: absolute;
+  top: -14px;
+  width: var(--size);
+  height: var(--size);
+  animation: snow-fall var(--fall) linear var(--delay) infinite;
+}
+
+.snow i::before {
+  content: "";
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: #fff;
+  opacity: var(--glow);
+  box-shadow: 0 0 6px 1px rgba(255, 255, 255, .35);
+  animation: snow-sway var(--sway) ease-in-out var(--delay) infinite alternate;
+}
+
+@keyframes snow-fall { to { transform: translate3d(0, calc(100vh + 28px), 0); } }
+@keyframes snow-sway { from { transform: translateX(-9px); } to { transform: translateX(9px); } }
+
+.garland {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -9px;
+  display: flex;
+  justify-content: space-evenly;
+  padding-top: 4px;
+  border-top: 1px solid rgba(255, 255, 255, .22); /* the wire */
+  pointer-events: none;
+}
+
+.garland i {
+  position: relative;
+  width: 9px;
+  height: 9px;
+  border-radius: 50%;
+  background: var(--bulb);
+  box-shadow: 0 0 7px 1px var(--bulb);
+  animation: bulb-glow 3.6s ease-in-out var(--delay) infinite;
+}
+
+/* the little cap that holds the bulb on the wire */
+.garland i::before {
+  content: "";
+  position: absolute;
+  left: 2.5px;
+  top: -4px;
+  width: 4px;
+  height: 4px;
+  border-radius: 1px;
+  background: rgba(255, 255, 255, .4);
+}
+
+@keyframes bulb-glow { 50% { opacity: .45; } }
+
+body:not(.is-winter) .snow,
+body:not(.is-winter) .garland { display: none; }
+
+.winter-note {
+  margin: -4px 0 16px;
+  padding: 10px 14px;
+  border: 1px solid rgba(255, 255, 255, .1);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, .08);
+  font-size: 15px;
+  line-height: 1.4;
+  color: rgba(255, 255, 255, .9);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .snow { display: none; }
+}
