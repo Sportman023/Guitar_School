@@ -10,7 +10,7 @@ import { renderGuitar } from './core/guitar.js';
 import { mountPlayers } from './screens/players.js';
 import workshop, { itemPreview, itemTitle } from './screens/workshop.js';
 import { IS_BETA } from './core/env.js';
-import { mountWinter, showWinter, winterGreeting } from './core/winter.js';
+import { mountWinter, showWinter, winterGreeting, withTree } from './core/winter.js';
 
 // a "БЕТА" badge, so the test copy is never mistaken for the real one
 document.body.classList.toggle('is-beta', IS_BETA);
@@ -175,7 +175,7 @@ function renderHome() {
   mount(appEl,
     el('p', { class: 'hello' }, `Привет, ${store.player.name}! Выбери, чем сегодня займёмся 🎸`),
     winterGreeting(),
-    renderGuitarCard(),
+    withTree(renderGuitarCard()),
     renderRainbowStrip(),
     el('div', { class: 'topics' }, topics().map((topic) => renderTopicCard(topic, seen))),
   );
